@@ -1,15 +1,13 @@
 import {useState,useEffect} from 'react'
 import axios from 'axios'
-
-export function Producto({}){
-    function crearProducto(nombre,stock,descripcion,precio){
+    export function crearProducto(nombre,stock,descripcion,precio){
         const datos = {
             nombre: nombre,
             stock: stock,
             descripcion:descripcion,
             precio: precio
         }
-        axios.post('http://localhost:8080/api/producto',{datos})
+        axios.post('http://localhost:8080/api/producto',datos)
         .then(function(response){
             console.log(response)
         })
@@ -17,9 +15,9 @@ export function Producto({}){
             console.log(error)
         })
     }
-    function buscarProductos(){
+    export function buscarProductos(){
         const [productos, setProductos] = useState([])
-        axios.get(`http://localhost:8080/api/producto`,{})
+        axios.get(`http://localhost:8080/api/producto`)
         .then((data)=>{
             setProductos(data)
         })
@@ -27,9 +25,9 @@ export function Producto({}){
             console.log(error)
         })
     }
-    function mostrarProducto({id}){
+    export function mostrarProducto({id}){
         const [producto,setProducto] = useState([])
-        axios.get(`http://localhost:8080/api/producto/${id}`,{})
+        axios.get(`http://localhost:8080/api/producto/${id}`)
          .then((data)=>{
             setProducto(data)
         })
@@ -37,14 +35,14 @@ export function Producto({}){
             console.log(error)
         })
     }
-    function actualizarProducto({id,nombre,stock,descripcion,precio}){
+    export function actualizarProducto({id,nombre,stock,descripcion,precio}){
         const datos ={
             nombre: nombre,
             stock: stock,
             descripcion:descripcion,
             precio: precio
         }
-        axios.put(`http://localhost:8080/api/producto/${id}`,{datos})
+        axios.put(`http://localhost:8080/api/producto/${id}`,datos)
         .then(function(response){
             console.log(response)
         })
@@ -52,8 +50,8 @@ export function Producto({}){
             console.log(error)
         })
     }
-    function borrarProducto ({id}){
-        axios.delete(`http://localhost:8080/api/producto/${id}`,{})
+    export function borrarProducto ({id}){
+        axios.delete(`http://localhost:8080/api/producto/${id}`)
         .then(function(response){
             console.log(response)
         })
@@ -61,4 +59,3 @@ export function Producto({}){
             console.log(error)
         })
     }
-}
