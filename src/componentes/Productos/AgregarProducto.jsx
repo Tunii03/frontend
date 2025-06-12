@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './AgregarProducto.css';
+import {crearProducto} from  '../../pages/Producto.js';
+
 
 export default function AgregarProducto({ onProductoAgregado }) {
     const [nombre, setNombre] = useState('');
@@ -33,7 +35,7 @@ export default function AgregarProducto({ onProductoAgregado }) {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!imagen) {
             setErrorImagen('Selecciona una imagen');
@@ -46,6 +48,12 @@ export default function AgregarProducto({ onProductoAgregado }) {
             descripcion,
             imagen: imagenPreview
         });
+        try{
+            await crearProducto(nombre,stock,descripcion,precio);
+        }
+        catch (error){
+            console.log(error)
+        }
         setNombre('');
         setPrecio(0);
         setStock(0);
