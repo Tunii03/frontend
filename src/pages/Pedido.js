@@ -1,15 +1,15 @@
 import {useState,useEffect} from 'react'
 import axios from 'axios'
 
-export function Pedido({}){
+
     const [idPedido, setIdPedido] = useState()
 
-    function crearPedido({monto,idcliente}){
+    export function crearPedido({monto,idcliente}){
         const datos = {
             monto:monto,
             clienteId: idcliente
         }
-        axios.post('http://localhost:8080/api/pedido',{datos})
+        axios.post('http://localhost:8080/api/pedido',datos)
         .then(function(response){
             console.log(response)
             setIdPedido(response.data.id)
@@ -19,12 +19,12 @@ export function Pedido({}){
             console.log(error)
         })
     }
-    function agregarProducto({idProducto,monto}){
+    export function agregarProducto({idProducto,monto}){
         const datos = {
             idProducto: idProducto,
             monto:monto
         }
-        axios.post(`http://localhost:8080/api/pedido/${idPedido}/producto`,{datos})
+        axios.post(`http://localhost:8080/api/pedido/${idPedido}/producto`,datos)
         .then(function(response){
             console.log(response)
         })
@@ -33,9 +33,9 @@ export function Pedido({}){
         })
     }
 
-    function buscarPedidos(){
+    export function buscarPedidos(){
         const [pedidos, setPedidos] = useState([])
-        axios.get(`http://localhost:8080/api/pedido`,{})
+        axios.get(`http://localhost:8080/api/pedido`)
         .then((data)=>{
             setPedidos(data)
         })
@@ -43,9 +43,9 @@ export function Pedido({}){
             console.log(error)
         })
     }
-    function mostrarPedido({id}){
+    export function mostrarPedido({id}){
         const [pedido,setPedido] = useState([])
-        axios.get(`http://localhost:8080/api/pedido/${id}`,{})
+        axios.get(`http://localhost:8080/api/pedido/${id}`)
         .then((data)=>{
             setPedido(data)
         })
@@ -53,11 +53,11 @@ export function Pedido({}){
             console.log(error)
         })
     }
-    function actualizarPedido({id,monto}){
+    export function actualizarPedido({id,monto}){
         const datos ={
             monto:monto
         }
-        axios.put(`http://localhost:8080/api/producto/${id}`,{datos})
+        axios.put(`http://localhost:8080/api/producto/${id}`,datos)
         .then(function(response){
             console.log(response)
         })
@@ -65,8 +65,8 @@ export function Pedido({}){
             console.log(error)
         })
     }
-    function borrarPedido ({id}){
-        axios.delete(`http://localhost:8080/api/pedido/${id}`,{})
+    export function borrarPedido ({id}){
+        axios.delete(`http://localhost:8080/api/pedido/${id}`)
         .then(function(response){
             console.log(response)
         })
@@ -74,4 +74,3 @@ export function Pedido({}){
             console.log(error)
         })
     }
-}
