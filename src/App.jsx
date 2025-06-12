@@ -4,6 +4,8 @@ import Inicio from './componentes/home/Inicio.jsx';
 import ListaProductos from './componentes/Productos/ListaProductos';
 import DetalleProducto from './componentes/Productos/DetalleProducto';
 import NavbarComponent from './componentes/Navbar/Navbar';
+import FormularioCliente from './componentes/Cliente/AgregarCliente.jsx';
+import DetalleCliente from './componentes/Cliente/DetalleCliente.jsx';
 
 function App() {
   return (
@@ -15,7 +17,12 @@ function App() {
             <Route path='/' element={<Inicio />} />
             <Route path='/productos' element={<ListaProductos />} />
             <Route path='/productos/:id' element={<DetalleProducto />} />
-            <Route path='/clientes' element={<div>Página de Clientes</div>} />
+            <Route path='/clientes' element={
+              <>
+                <FormularioCliente />
+                <DetalleCliente />
+              </>
+            } />
             <Route path='/pedidos' element={<div>Página de Pedidos</div>} />
             <Route path='/presupuestos' element={<div>Página de Presupuestos</div>} />
           </Routes>
