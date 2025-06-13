@@ -1,55 +1,56 @@
 import React, { useState } from 'react';
 import { crearCliente } from "../../pages/Cliente";
 
-export default function AgregarCliente() {
+export default function AgregarCliente({ onClienteAgregado }) {
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [correo, setCorreo] = useState("");
     const [cuit, setCuit] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const funciones = Cliente({}); 
-        crearCliente(nombre, razonSocial, correo, cuit);
-
-        setNombre("");
-        setRazonSocial("");
-        setCorreo("");
+        onClienteAgregado({
+            nombre,
+            razonSocial,
+            correo,
+            cuit: Number(cuit),
+        });
+        try{
+            await crearProducto(nombre,razonSocial, correo, cuit);
+        }
+        catch (error){
+            console.log(error)
+        }
+        setNombre('');
+        setRazonSocial('');
+        setCorreo('');
         setCuit("");
     };
 
-    const handleChange = (e, setter) => setter(e.target.value);
-
     return (
-        <div className="FormularioBusqueda">
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={nombre}
-                    placeholder="Nombre y apellido del cliente"
-                    onChange={(e) => handleChange(e, setNombre)}
-                />
-                <input
-                    type="text"
-                    value={razonSocial}
-                    placeholder="Razón social"
-                    onChange={(e) => handleChange(e, setRazonSocial)}
-                />
-                <input
-                    type="text"
-                    value={correo}
-                    placeholder="Correo Electrónico"
-                    onChange={(e) => handleChange(e, setCorreo)}
-                />
-                <input
-                    type="number"
-                    value={cuit}
-                    placeholder="CUIT"
-                    onChange={(e) => handleChange(e, setCuit)}
-                />
-                <button type="submit">Agregar</button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit} className="formulario">
+            <div className="form-group">
+                <label>Nombre:
+                    <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required />
+                </label>
+            </div>
+            <div className="form-group">
+                <label>Razón social:
+                    <input type="text" value={razonSocial} onChange={e => setRazonSocial(e.target.value)} required />
+                </label>
+            </div>
+            <div className="form-group">
+                <label>Correo electrónico:
+                    <input type="text" value={correo} onChange={e => setCorreo(e.target.value)} required />
+                </label>
+            </div>
+            <div className="form-group">
+                <label>CUIT:
+                    <input type="number" value={cuit} onChange={e => setCuit(e.target.value)} required />
+                </label>
+            </div>
+            <button type="submit" className="btn-submit">Agregar Cliente</button>
+        </form>
     );
 }
 

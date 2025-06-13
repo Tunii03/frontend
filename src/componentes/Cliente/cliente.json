@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nombre": "Catalina Cavallo",
+    "razonSocial": "Grido",
+    "correo": "catalinacavallo10@gmail.com",
+    "cuit": 2345695065
+  },
+  {
+    "id": 2,
+    "nombre": "Catalina Cavallo",
+    "razonSocial": "Grido",
+    "correo": "catalinacavallo10@gmail.com",
+    "cuit": 2345695065
+  },
+  {
+    "id": 3,
+    "nombre": "Catalina Cavallo",
+    "razonSocial": "Grido",
+    "correo": "catalinacavallo10@gmail.com",
+    "cuit": 2345695065
+  },
+  {
+    "id": 4,
+    "nombre": "Catalina Cavallo",
+    "razonSocial": "Grido",
+    "correo": "catalinacavallo10@gmail.com",
+    "cuit": 2345695065
+  }
+]

@@ -8,7 +8,7 @@ import axios from 'axios'
             correo: correo,
             cuit: cuit,
         }
-        axios.post('http://localhost:8080/api/cliente',{datos})
+        axios.post('http://localhost:8080/api/cliente',datos)
         .then(function(response){
             console.log(response)
         })
@@ -35,7 +35,7 @@ import axios from 'axios'
             correo: correo,
             cuit: cuit,
         }
-        axios.put(`http://localhost:8080/api/cliente/${id}`,{datos})
+        axios.put(`http://localhost:8080/api/cliente/${id}`,datos)
         .then(function(response){
             console.log(response)
         })
