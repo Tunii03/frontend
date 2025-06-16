@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
+import { FaEdit } from 'react-icons/fa';
 import './DetalleProducto.css';
 
 export default function DetalleProducto() {
@@ -13,6 +14,10 @@ export default function DetalleProducto() {
         const encontrado = productos.find(p => p.id === Number(id));
         if (encontrado) setProducto(encontrado);
     }, [id]);
+
+    const editarProducto = () => {
+        navigate(`/productos/editar/${id}`);
+    };
 
     if (!producto) {
         return (
@@ -43,6 +48,11 @@ export default function DetalleProducto() {
                         <Button variant="primary" onClick={() => navigate('/productos')}>Volver al catálogo</Button>
                     </div>
                 </div>
+            </div>
+            <div className="acciones-producto">
+                <button className="btn-editar-producto" onClick={editarProducto}>
+                    <FaEdit style={{ marginRight: '8px' }} /> Editar Producto
+                </button>
             </div>
         </div>
     );

@@ -3,11 +3,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Inicio from './componentes/home/Inicio.jsx';
 import ListaProductos from './componentes/Productos/ListaProductos';
 import DetalleProducto from './componentes/Productos/DetalleProducto';
+import EditarProducto from './componentes/Productos/EditarProducto.jsx';
 import NavbarComponent from './componentes/Navbar/Navbar';
-import Pedidos from './componentes/Pedidos/Pedidos';
+import Pedidos from './componentes/Pedidos/ListaPedidos';
 import DetallePedido from './componentes/Pedidos/DetallePedido';
+import EditarPedido from './componentes/Pedidos/EditarPedido.jsx';
 import AgregarCliente from './componentes/Cliente/AgregarCliente.jsx';
 import DetalleCliente from './componentes/Cliente/DetalleCliente.jsx';
+import ListaClientes from './componentes/Cliente/ListaClientes.jsx';
+import EditarCliente from './componentes/Cliente/EditarCliente.jsx';
 
 function App() {
   return (
@@ -18,9 +22,14 @@ function App() {
           <Routes>
             <Route path='/' element={<Inicio />} />
             <Route path='/productos' element={<ListaProductos />} />
+            <Route path='/productos/editar/:id' element={<EditarProducto />} />
             <Route path='/productos/:id' element={<DetalleProducto />} />
-            <Route path='/clientes' element={ <DetalleCliente /> } />
+            <Route path='/clientes' element={<ListaClientes />} />
+            <Route path='/clientes/agregar' element={<AgregarCliente />} />
+            <Route path='/clientes/editar/:id' element={<EditarCliente />} />
+            <Route path='/clientes/:id' element={<DetalleCliente />} />
             <Route path='/pedidos' element={<Pedidos />} />
+            <Route path='/pedidos/editar/:id' element={<EditarPedido />} />
             <Route path='/pedidos/:id' element={<DetallePedido />} />
             <Route path='/presupuestos' element={<div>Página de Presupuestos</div>} />
           </Routes>

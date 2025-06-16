@@ -1,54 +1,77 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './AgregarCliente.css';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import './EditarCliente.css';
 
-export default function AgregarCliente() {
+export default function EditarCliente() {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [correo, setCorreo] = useState("");
     const [cuit, setCuit] = useState("");
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        cargarCliente();
+        // eslint-disable-next-line
+    }, [id]);
+
+    const cargarCliente = () => {
         setLoading(true);
         setError(null);
-        if (!nombre || !razonSocial || !correo || !cuit) {
-            setError('Todos los campos son obligatorios');
-            setLoading(false);
-            return;
-        }
         try {
             const guardados = localStorage.getItem('clientes');
             const clientes = guardados ? JSON.parse(guardados) : [];
-            const nuevoCliente = {
-                id: Date.now(),
-                nombre,
-                razonSocial,
-                correo,
-                cuit: Number(cuit)
-            };
-            clientes.push(nuevoCliente);
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            // Redirigir a la lista de clientes
-            navigate('/clientes');
+            const cliente = clientes.find(c => String(c.id) === String(id));
+            if (cliente) {
+                setNombre(cliente.nombre);
+                setRazonSocial(cliente.razonSocial);
+                setCorreo(cliente.correo);
+                setCuit(cliente.cuit);
+            } else {
+                setError('No se encontró el cliente');
+            }
         } catch (error) {
-            setError('Error al guardar el cliente');
+            setError('Error al cargar el cliente');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError(null);
+        if (!nombre || !razonSocial || !correo || !cuit) {
+            setError('Todos los campos son obligatorios');
+            return;
+        }
+        try {
+            const guardados = localStorage.getItem('clientes');
+            let clientes = guardados ? JSON.parse(guardados) : [];
+            clientes = clientes.map(c =>
+                String(c.id) === String(id)
+                    ? { ...c, nombre, razonSocial, correo, cuit: Number(cuit) }
+                    : c
+            );
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            navigate('/clientes');
+        } catch (error) {
+            setError('Error al guardar los cambios');
+        }
+    };
+
+    if (loading) {
+        return <div className="formulario"><span>Cargando...</span></div>;
+    }
+
+    if (error) {
+        return <div className="formulario"><div className="alert alert-danger">{error}</div></div>;
+    }
+
     return (
         <form onSubmit={handleSubmit} className="formulario">
-            {error && (
-                <div className="alert alert-danger" role="alert">
-                    {error}
-                </div>
-            )}
-
+            <h2>Editar Cliente</h2>
             <div className="form-group">
                 <label htmlFor="nombre">Nombre:</label>
                 <input
@@ -57,10 +80,8 @@ export default function AgregarCliente() {
                     value={nombre}
                     onChange={e => setNombre(e.target.value)}
                     required
-                    placeholder="Ingrese el nombre del cliente"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="razonSocial">Razón social:</label>
                 <input
@@ -69,10 +90,8 @@ export default function AgregarCliente() {
                     value={razonSocial}
                     onChange={e => setRazonSocial(e.target.value)}
                     required
-                    placeholder="Ingrese la razón social"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="correo">Correo electrónico:</label>
                 <input
@@ -81,10 +100,8 @@ export default function AgregarCliente() {
                     value={correo}
                     onChange={e => setCorreo(e.target.value)}
                     required
-                    placeholder="Ingrese el correo electrónico"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="cuit">CUIT:</label>
                 <input
@@ -93,18 +110,10 @@ export default function AgregarCliente() {
                     value={cuit}
                     onChange={e => setCuit(e.target.value)}
                     required
-                    placeholder="Ingrese el CUIT"
                 />
             </div>
-
-            <button 
-                type="submit" 
-                className="btn-submit"
-                disabled={loading}
-            >
-                {loading ? 'Guardando...' : 'Agregar Cliente'}
-            </button>
+            <button type="submit" className="btn-submit">Guardar Cambios</button>
+            <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/clientes')}>Cancelar</button>
         </form>
     );
-}
-
+} 

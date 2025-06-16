@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Table, Alert, Spinner } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
-import { obtenerPedido } from '../../pages/Pedido';
 import './DetallePedido.css';
 
 export default function DetallePedido() {
@@ -14,17 +13,23 @@ export default function DetallePedido() {
 
     useEffect(() => {
         cargarPedido();
+        // eslint-disable-next-line
     }, [id]);
 
-    const cargarPedido = async () => {
+    const cargarPedido = () => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            setError(null);
-            const data = await obtenerPedido(id);
-            setPedido(data);
+            const pedidosGuardados = localStorage.getItem('pedidos');
+            const pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
+            const pedidoEncontrado = pedidos.find(p => String(p.id) === String(id));
+            if (pedidoEncontrado) {
+                setPedido(pedidoEncontrado);
+            } else {
+                setError('No se encontró el pedido');
+            }
         } catch (error) {
-            setError(error.message || 'Error al cargar el pedido');
-            console.error('Error:', error);
+            setError('Error al cargar el pedido');
         } finally {
             setLoading(false);
         }
@@ -58,18 +63,7 @@ export default function DetallePedido() {
     }
 
     if (!pedido) {
-        return (
-            <div className="detalle-pedido">
-                <div className="pedido-no-encontrado">
-                    <Alert variant="warning">
-                        No se encontró el pedido
-                    </Alert>
-                    <Button variant="primary" onClick={() => navigate('/pedidos')}>
-                        Volver a Pedidos
-                    </Button>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (

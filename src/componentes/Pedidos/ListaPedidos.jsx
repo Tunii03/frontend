@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Table, Alert, Spinner } from 'react-bootstrap';
-import { FaPlus, FaEye } from 'react-icons/fa';
+import { FaPlus, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { crearPedido, agregarProducto, obtenerPedidos } from '../../pages/Pedido';
-import './Pedidos.css';
+import './ListaPedidos.css';
 
 export default function Pedidos() {
     const navigate = useNavigate();
     const [pedidos, setPedidos] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [nuevoPedido, setNuevoPedido] = useState({
-        cliente: '',
+        clienteId: '',
         productos: [],
         montoTotal: 0
     });
     const [productos, setProductos] = useState([]);
+    const [clientes, setClientes] = useState([]);
     const [productoSeleccionado, setProductoSeleccionado] = useState('');
     const [cantidad, setCantidad] = useState(1);
     const [error, setError] = useState(null);
@@ -23,23 +23,23 @@ export default function Pedidos() {
     useEffect(() => {
         cargarPedidos();
         cargarProductos();
+        cargarClientes();
     }, []);
 
-    const cargarPedidos = async () => {
+    const cargarPedidos = () => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            setError(null);
-            const data = await obtenerPedidos();
-            setPedidos(data);
+            const guardados = localStorage.getItem('pedidos');
+            setPedidos(guardados ? JSON.parse(guardados) : []);
         } catch (error) {
-            setError(error.message || 'Error al cargar los pedidos');
-            console.error('Error:', error);
+            setError('Error al cargar los pedidos');
         } finally {
             setLoading(false);
         }
     };
 
-    const cargarProductos = async () => {
+    const cargarProductos = () => {
         try {
             const productosGuardados = localStorage.getItem('productos');
             if (productosGuardados) {
@@ -47,7 +47,19 @@ export default function Pedidos() {
             }
         } catch (error) {
             setError('Error al cargar los productos');
-            console.error(error);
+        }
+    };
+
+    const cargarClientes = () => {
+        try {
+            const clientesGuardados = localStorage.getItem('clientes');
+            if (clientesGuardados) {
+                setClientes(JSON.parse(clientesGuardados));
+            } else {
+                setClientes([]);
+            }
+        } catch (error) {
+            setError('Error al cargar los clientes');
         }
     };
 
@@ -78,40 +90,34 @@ export default function Pedidos() {
         }));
     };
 
-    const guardarPedido = async () => {
+    const guardarPedido = () => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            setError(null);
-            
-            // Crear el pedido
-            const pedidoCreado = await crearPedido({
-                monto: nuevoPedido.montoTotal,
-                idcliente: nuevoPedido.cliente
-            });
-
-            // Agregar cada producto al pedido
-            for (const producto of nuevoPedido.productos) {
-                await agregarProducto({
-                    idPedido: pedidoCreado.id,
-                    idProducto: producto.id,
-                    cantidad: producto.cantidad,
-                    monto: producto.subtotal
+            if (nuevoPedido.clienteId && nuevoPedido.productos.length > 0) {
+                const pedidosActuales = localStorage.getItem('pedidos');
+                const pedidosArray = pedidosActuales ? JSON.parse(pedidosActuales) : [];
+                const clienteSeleccionado = clientes.find(c => String(c.id) === String(nuevoPedido.clienteId));
+                const nuevo = {
+                    ...nuevoPedido,
+                    cliente: clienteSeleccionado ? clienteSeleccionado.nombre : '',
+                    id: Date.now(),
+                    fecha: new Date().toISOString()
+                };
+                pedidosArray.push(nuevo);
+                localStorage.setItem('pedidos', JSON.stringify(pedidosArray));
+                setPedidos(pedidosArray);
+                setNuevoPedido({
+                    clienteId: '',
+                    productos: [],
+                    montoTotal: 0
                 });
+                setMostrarModal(false);
+            } else {
+                setError('Debe seleccionar un cliente y al menos un producto');
             }
-
-            // Actualizar la lista de pedidos
-            await cargarPedidos();
-            
-            // Limpiar el formulario
-            setNuevoPedido({
-                cliente: '',
-                productos: [],
-                montoTotal: 0
-            });
-            setMostrarModal(false);
         } catch (error) {
-            setError(error.message || 'Error al guardar el pedido');
-            console.error('Error:', error);
+            setError('Error al guardar el pedido');
         } finally {
             setLoading(false);
         }
@@ -119,6 +125,24 @@ export default function Pedidos() {
 
     const verDetalle = (id) => {
         navigate(`/pedidos/${id}`);
+    };
+
+    const editarPedido = (id) => {
+        navigate(`/pedidos/editar/${id}`);
+    };
+
+    const eliminarPedido = (id) => {
+        if (window.confirm('¿Seguro que deseas eliminar este pedido?')) {
+            try {
+                const guardados = localStorage.getItem('pedidos');
+                const pedidosArray = guardados ? JSON.parse(guardados) : [];
+                const nuevos = pedidosArray.filter(p => p.id !== id);
+                localStorage.setItem('pedidos', JSON.stringify(nuevos));
+                setPedidos(nuevos);
+            } catch (error) {
+                setError('Error al eliminar el pedido');
+            }
+        }
     };
 
     return (
@@ -154,23 +178,43 @@ export default function Pedidos() {
                         </tr>
                     </thead>
                     <tbody>
-                        {pedidos.map(pedido => (
-                            <tr key={pedido.id}>
-                                <td>{pedido.id}</td>
-                                <td>{pedido.cliente}</td>
-                                <td>{new Date(pedido.fecha).toLocaleDateString()}</td>
-                                <td>${pedido.montoTotal}</td>
-                                <td>
-                                    <Button 
-                                        variant="info" 
-                                        size="sm"
-                                        onClick={() => verDetalle(pedido.id)}
-                                    >
-                                        <FaEye /> Ver Detalle
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
+                        {pedidos.length === 0 ? (
+                            <tr><td colSpan="5">No hay pedidos registrados.</td></tr>
+                        ) : (
+                            pedidos.map(pedido => (
+                                <tr key={pedido.id}>
+                                    <td>{pedido.id}</td>
+                                    <td>{pedido.cliente}</td>
+                                    <td>{new Date(pedido.fecha).toLocaleDateString()}</td>
+                                    <td>${pedido.montoTotal}</td>
+                                    <td>
+                                        <Button 
+                                            variant="info" 
+                                            size="sm"
+                                            onClick={() => verDetalle(pedido.id)}
+                                            className="me-2"
+                                        >
+                                            <FaEye />
+                                        </Button>
+                                        <Button
+                                            variant="warning"
+                                            size="sm"
+                                            onClick={() => editarPedido(pedido.id)}
+                                            className="me-2"
+                                        >
+                                            <FaEdit />
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+                                            onClick={() => eliminarPedido(pedido.id)}
+                                        >
+                                            <FaTrash />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </Table>
             )}
@@ -183,12 +227,16 @@ export default function Pedidos() {
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Cliente</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={nuevoPedido.cliente}
-                                onChange={e => setNuevoPedido(prev => ({ ...prev, cliente: e.target.value }))}
-                                placeholder="Nombre del cliente"
-                            />
+                            <Form.Select
+                                value={nuevoPedido.clienteId}
+                                onChange={e => setNuevoPedido(prev => ({ ...prev, clienteId: e.target.value }))}
+                                required
+                            >
+                                <option value="">Seleccione un cliente</option>
+                                {clientes.map(c => (
+                                    <option key={c.id} value={c.id}>{c.nombre} ({c.cuit})</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
 
                         <div className="agregar-producto">
@@ -252,7 +300,7 @@ export default function Pedidos() {
                     <Button 
                         variant="primary" 
                         onClick={guardarPedido}
-                        disabled={loading || !nuevoPedido.cliente || nuevoPedido.productos.length === 0}
+                        disabled={loading || !nuevoPedido.clienteId || nuevoPedido.productos.length === 0}
                     >
                         {loading ? (
                             <>
