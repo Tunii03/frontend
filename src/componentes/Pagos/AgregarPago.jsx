@@ -3,27 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import './AgregarPago.css';
 
 export default function AgregarPago() {
+    // Estado para la lista de presupuestos
     const [presupuestos, setPresupuestos] = useState([]);
+    // Estado para el presupuesto seleccionado
     const [idPresupuesto, setIdPresupuesto] = useState('');
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Carga los presupuestos al montar el componente
     useEffect(() => {
         const presupuestosGuardados = localStorage.getItem('presupuestos');
         setPresupuestos(presupuestosGuardados ? JSON.parse(presupuestosGuardados) : []);
     }, []);
 
+    // Maneja el envío del formulario para agregar un pago
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        // Validación simple de selección de presupuesto
         if (!idPresupuesto) {
             setError('Debe seleccionar un presupuesto');
             setLoading(false);
             return;
         }
         try {
+            // Obtiene los pagos actuales y agrega el nuevo
             const pagosGuardados = localStorage.getItem('pagos');
             const pagos = pagosGuardados ? JSON.parse(pagosGuardados) : [];
             const nuevoPago = {
@@ -44,6 +52,7 @@ export default function AgregarPago() {
     return (
         <form onSubmit={handleSubmit} className="formulario-pago">
             <h2>Nuevo Pago</h2>
+            {/* Muestra errores de validación o guardado */}
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="form-group">
                 <label>Presupuesto:</label>

@@ -5,23 +5,29 @@ import './AgregarPedido.css';
 export default function AgregarPedido({
   show, onHide, onPedidoAgregado, productosGlobal, clientesGlobal
 }) {
+  // Estado para el nuevo pedido
   const [nuevoPedido, setNuevoPedido] = useState({
     clienteId: '',
     productos: [],
     montoTotal: 0
   });
+  // Estado para la lista de productos y clientes
   const [productos, setProductos] = useState([]);
   const [clientes, setClientes] = useState([]);
+  // Estado para el producto seleccionado y cantidad
   const [productoSeleccionado, setProductoSeleccionado] = useState('');
   const [cantidad, setCantidad] = useState(1);
+  // Estado para errores y loading
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Actualiza productos y clientes cuando cambian los props
   useEffect(() => {
     setProductos(productosGlobal || []);
     setClientes(clientesGlobal || []);
   }, [productosGlobal, clientesGlobal]);
 
+  // Agrega un producto al pedido con validación de stock
   const agregarProductoAlPedido = () => {
     const producto = productos.find(p => p.id === Number(productoSeleccionado));
     if (producto) {
@@ -46,6 +52,7 @@ export default function AgregarPedido({
     }
   };
 
+  // Elimina un producto del pedido
   const eliminarProductoDelPedido = (index) => {
     const productoAEliminar = nuevoPedido.productos[index];
     setNuevoPedido(prev => ({
@@ -55,6 +62,7 @@ export default function AgregarPedido({
     }));
   };
 
+  // Guarda el pedido, valida stock y descuenta del localStorage
   const guardarPedido = () => {
     setLoading(true);
     setError(null);

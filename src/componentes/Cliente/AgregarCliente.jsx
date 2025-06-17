@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './AgregarCliente.css';
 
 export default function AgregarCliente() {
+    // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [correo, setCorreo] = useState("");
@@ -11,16 +12,19 @@ export default function AgregarCliente() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Maneja el envío del formulario para agregar un cliente
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        // Validación simple de campos obligatorios
         if (!nombre || !razonSocial || !correo || !cuit) {
             setError('Todos los campos son obligatorios');
             setLoading(false);
             return;
         }
         try {
+            // Obtiene los clientes actuales y agrega el nuevo
             const guardados = localStorage.getItem('clientes');
             const clientes = guardados ? JSON.parse(guardados) : [];
             const nuevoCliente = {
@@ -32,7 +36,7 @@ export default function AgregarCliente() {
             };
             clientes.push(nuevoCliente);
             localStorage.setItem('clientes', JSON.stringify(clientes));
-            // Redirigir a la lista de clientes
+            // Redirige a la lista de clientes
             navigate('/clientes');
         } catch (error) {
             setError('Error al guardar el cliente');
@@ -43,6 +47,7 @@ export default function AgregarCliente() {
 
     return (
         <form onSubmit={handleSubmit} className="formulario">
+            {/* Muestra errores de validación o guardado */}
             {error && (
                 <div className="alert alert-danger" role="alert">
                     {error}

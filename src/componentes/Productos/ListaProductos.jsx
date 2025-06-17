@@ -7,6 +7,7 @@ import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
 import './ListaProductos.css';
 
 export default function ListaProductos() {
+    // Estado para la lista de productos
     const [productos, setProductos] = useState(() => {
         const guardados = localStorage.getItem('productos');
         if (guardados) {
@@ -15,29 +16,36 @@ export default function ListaProductos() {
         }
         return [];
     });
+    // Estado para mostrar el modal de agregar producto
     const [mostrarModal, setMostrarModal] = useState(false);
+    // Estado para la búsqueda
     const [busqueda, setBusqueda] = useState('');
     const navigate = useNavigate();
 
+    // Actualiza localStorage cuando cambia la lista de productos
     useEffect(() => {
         localStorage.setItem('productos', JSON.stringify(productos));
     }, [productos]);
 
+    // Agrega un nuevo producto a la lista
     const agregarProducto = (nuevo) => {
         setProductos([...productos, { ...nuevo, id: Date.now() }]);
         setMostrarModal(false);
     };
 
+    // Elimina un producto por id
     const eliminarProducto = (e, id) => {
         e.stopPropagation();
         setProductos(productos.filter(p => p.id !== id));
     };
 
+    // Navega al detalle del producto
     const verDetalle = (id) => {
         navigate(`/productos/${id}`);
     };
 
-    const filtrados = productos.filter(p =>
+    // Filtra productos por nombre según la búsqueda
+    const productosFiltrados = productos.filter(p =>
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
 
@@ -61,10 +69,10 @@ export default function ListaProductos() {
                 </div>
             </div>
             <div className="catalogo-productos">
-                {filtrados.length === 0 ? (
+                {productosFiltrados.length === 0 ? (
                     <p className="no-productos">No hay productos en el catálogo</p>
                 ) : (
-                    filtrados.map((p) => (
+                    productosFiltrados.map((p) => (
                         <div
                             key={p.id}
                             className="producto-item"

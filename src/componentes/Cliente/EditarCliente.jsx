@@ -5,6 +5,7 @@ import './EditarCliente.css';
 export default function EditarCliente() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [correo, setCorreo] = useState("");
@@ -12,11 +13,13 @@ export default function EditarCliente() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Carga los datos del cliente al montar o cambiar el id
     useEffect(() => {
         cargarCliente();
         // eslint-disable-next-line
     }, [id]);
 
+    // Busca el cliente por id en localStorage y setea los campos
     const cargarCliente = () => {
         setLoading(true);
         setError(null);
@@ -39,14 +42,17 @@ export default function EditarCliente() {
         }
     };
 
+    // Maneja el envío del formulario para editar el cliente
     const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
+        // Validación simple de campos obligatorios
         if (!nombre || !razonSocial || !correo || !cuit) {
             setError('Todos los campos son obligatorios');
             return;
         }
         try {
+            // Actualiza el cliente en localStorage
             const guardados = localStorage.getItem('clientes');
             let clientes = guardados ? JSON.parse(guardados) : [];
             clientes = clientes.map(c =>

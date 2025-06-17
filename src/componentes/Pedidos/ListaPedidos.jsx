@@ -7,19 +7,27 @@ import AgregarPedido from './AgregarPedido.jsx';
 
 export default function Pedidos() {
     const navigate = useNavigate();
+    // Estado para la lista de pedidos
     const [pedidos, setPedidos] = useState([]);
+    // Estado para mostrar el modal de agregar pedido
     const [mostrarModal, setMostrarModal] = useState(false);
+    // Estado para la lista de productos
     const [productos, setProductos] = useState([]);
+    // Estado para la lista de clientes
     const [clientes, setClientes] = useState([]);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(false);
 
+    // Carga pedidos, productos y clientes al montar el componente
     useEffect(() => {
         cargarPedidos();
         cargarProductos();
         cargarClientes();
     }, []);
 
+    // Obtiene los pedidos desde localStorage
     const cargarPedidos = () => {
         setLoading(true);
         setError(null);
@@ -33,6 +41,7 @@ export default function Pedidos() {
         }
     };
 
+    // Obtiene los productos desde localStorage
     const cargarProductos = () => {
         try {
             const productosGuardados = localStorage.getItem('productos');
@@ -44,6 +53,7 @@ export default function Pedidos() {
         }
     };
 
+    // Obtiene los clientes desde localStorage
     const cargarClientes = () => {
         try {
             const clientesGuardados = localStorage.getItem('clientes');
@@ -57,14 +67,17 @@ export default function Pedidos() {
         }
     };
 
+    // Navega al detalle del pedido
     const verDetalle = (id) => {
         navigate(`/pedidos/${id}`);
     };
 
+    // Navega a la edición del pedido
     const editarPedido = (id) => {
         navigate(`/pedidos/editar/${id}`);
     };
 
+    // Elimina un pedido por id, con confirmación
     const eliminarPedido = (id) => {
         if (window.confirm('¿Seguro que deseas eliminar este pedido?')) {
             try {

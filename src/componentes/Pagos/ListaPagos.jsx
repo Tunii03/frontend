@@ -4,17 +4,23 @@ import { FaPlus } from 'react-icons/fa';
 import './ListaPagos.css';
 
 export default function ListaPagos() {
+    // Estado para la lista de pagos
     const [pagos, setPagos] = useState([]);
+    // Estado para la lista de presupuestos
     const [presupuestos, setPresupuestos] = useState([]);
+    // Estado para loading
     const [loading, setLoading] = useState(true);
+    // Estado para errores
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    // Carga los pagos y presupuestos al montar el componente
     useEffect(() => {
         cargarPagos();
         cargarPresupuestos();
     }, []);
 
+    // Obtiene los pagos desde localStorage
     const cargarPagos = () => {
         setLoading(true);
         setError(null);
@@ -28,6 +34,7 @@ export default function ListaPagos() {
         }
     };
 
+    // Obtiene los presupuestos desde localStorage
     const cargarPresupuestos = () => {
         try {
             const guardados = localStorage.getItem('presupuestos');
@@ -37,10 +44,12 @@ export default function ListaPagos() {
         }
     };
 
+    // Navega al formulario de agregar pago
     const agregarPago = () => {
         navigate('/pago/agregar');
     };
 
+    // Busca un presupuesto por id
     const obtenerPresupuesto = (idPresupuesto) => {
         return presupuestos.find(p => String(p.id) === String(idPresupuesto));
     };

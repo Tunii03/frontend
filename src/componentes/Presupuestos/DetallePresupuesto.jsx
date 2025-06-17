@@ -5,16 +5,21 @@ import './DetallePresupuesto.css';
 export default function DetallePresupuesto() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estado para el presupuesto actual
     const [presupuesto, setPresupuesto] = useState(null);
+    // Estado para el pedido relacionado
     const [pedido, setPedido] = useState(null);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(true);
 
+    // Carga los datos del presupuesto y pedido al montar o cambiar el id
     useEffect(() => {
         cargarDatos();
-        // eslint-disable-next-line
     }, [id]);
 
+    // Busca el presupuesto y su pedido relacionado en localStorage
     const cargarDatos = () => {
         setLoading(true);
         setError(null);
@@ -39,9 +44,11 @@ export default function DetallePresupuesto() {
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return <div className="detalle-presupuesto"><span>Cargando...</span></div>;
     }
     if (error) {
+        // Muestra errores y un mensaje
         return <div className="detalle-presupuesto"><div className="alert alert-danger">{error}</div></div>;
     }
     if (!presupuesto) return null;

@@ -3,28 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import './AgregarPresupuesto.css';
 
 export default function AgregarPresupuesto() {
+    // Estado para la lista de pedidos
     const [pedidos, setPedidos] = useState([]);
+    // Estado para el pedido seleccionado
     const [idPedido, setIdPedido] = useState('');
+    // Estado para el estado del presupuesto (pagado/pendiente)
     const [estado, setEstado] = useState(false);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Carga los pedidos al montar el componente
     useEffect(() => {
         const pedidosGuardados = localStorage.getItem('pedidos');
         setPedidos(pedidosGuardados ? JSON.parse(pedidosGuardados) : []);
     }, []);
 
+    // Maneja el envío del formulario para agregar un presupuesto
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        // Validación simple de selección de pedido
         if (!idPedido) {
             setError('Debe seleccionar un pedido');
             setLoading(false);
             return;
         }
         try {
+            // Obtiene los presupuestos actuales y agrega el nuevo
             const presupuestosGuardados = localStorage.getItem('presupuestos');
             const presupuestos = presupuestosGuardados ? JSON.parse(presupuestosGuardados) : [];
             const nuevoPresupuesto = {
@@ -46,6 +55,7 @@ export default function AgregarPresupuesto() {
     return (
         <form onSubmit={handleSubmit} className="formulario-presupuesto">
             <h2>Nuevo Presupuesto</h2>
+            {/* Muestra errores de validación o guardado */}
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="form-group">
                 <label>Pedido:</label>

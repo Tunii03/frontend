@@ -7,19 +7,23 @@ import './DetalleProducto.css';
 export default function DetalleProducto() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estado para el producto actual
     const [producto, setProducto] = useState(null);
 
+    // Carga el producto al montar o cambiar el id
     useEffect(() => {
         const productos = JSON.parse(localStorage.getItem('productos') || '[]');
         const encontrado = productos.find(p => p.id === Number(id));
         if (encontrado) setProducto(encontrado);
     }, [id]);
 
+    // Navega a la edición del producto
     const editarProducto = () => {
         navigate(`/productos/editar/${id}`);
     };
 
     if (!producto) {
+        // Muestra mensaje si no se encuentra el producto
         return (
             <div className="detalle-producto">
                 <div className="producto-no-encontrado">

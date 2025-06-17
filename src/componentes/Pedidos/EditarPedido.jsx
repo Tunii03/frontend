@@ -6,6 +6,7 @@ import './ListaPedidos.css';
 export default function EditarPedido() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estados para los datos del pedido y formularios
     const [clientes, setClientes] = useState([]);
     const [productos, setProductos] = useState([]);
     const [pedido, setPedido] = useState(null);
@@ -17,11 +18,13 @@ export default function EditarPedido() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Carga los datos del pedido, clientes y productos al montar o cambiar el id
     useEffect(() => {
         cargarDatos();
         // eslint-disable-next-line
     }, [id]);
 
+    // Busca el pedido, clientes y productos en localStorage y setea los campos
     const cargarDatos = () => {
         setLoading(true);
         setError(null);
@@ -55,6 +58,7 @@ export default function EditarPedido() {
         }
     };
 
+    // Agrega un producto al pedido
     const agregarProductoAlPedido = () => {
         const producto = productos.find(p => p.id === Number(productoSeleccionado));
         if (producto) {
@@ -70,12 +74,14 @@ export default function EditarPedido() {
         }
     };
 
+    // Elimina un producto del pedido
     const eliminarProductoDelPedido = (index) => {
         const productoAEliminar = productosPedido[index];
         setProductosPedido(prev => prev.filter((_, i) => i !== index));
         setMontoTotal(prev => prev - productoAEliminar.subtotal);
     };
 
+    // Cambia la cantidad de un producto en el pedido
     const cambiarCantidadProducto = (index, nuevaCantidad) => {
         setProductosPedido(prev => prev.map((p, i) => {
             if (i === index) {
@@ -90,6 +96,7 @@ export default function EditarPedido() {
         }, 0);
     };
 
+    // Guarda los cambios del pedido editado
     const handleGuardar = (e) => {
         e.preventDefault();
         setError(null);
@@ -120,9 +127,11 @@ export default function EditarPedido() {
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return <div className="formulario"><span>Cargando...</span></div>;
     }
     if (error) {
+        // Muestra errores y un mensaje
         return <div className="formulario"><div className="alert alert-danger">{error}</div></div>;
     }
 

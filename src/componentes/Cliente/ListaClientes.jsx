@@ -4,15 +4,20 @@ import './ListaClientes.css';
 import { FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
 export default function ListaClientes() {
+    // Estado para la lista de clientes
     const [clientes, setClientes] = useState([]);
+    // Estado para mostrar loading
     const [loading, setLoading] = useState(true);
+    // Estado para errores
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    // Cargar clientes al montar el componente
     useEffect(() => {
         cargarClientes();
     }, []);
 
+    // Obtiene los clientes desde localStorage
     const cargarClientes = () => {
         setLoading(true);
         setError(null);
@@ -26,33 +31,32 @@ export default function ListaClientes() {
         }
     };
 
-    const handleEliminar = (id) => {
-        if (window.confirm('¿Seguro que deseas eliminar este cliente?')) {
-            try {
-                const guardados = localStorage.getItem('clientes');
-                const clientesArray = guardados ? JSON.parse(guardados) : [];
-                const nuevos = clientesArray.filter(c => c.id !== id);
-                localStorage.setItem('clientes', JSON.stringify(nuevos));
-                setClientes(nuevos);
-            } catch (error) {
-                setError('Error al eliminar el cliente');
-            }
+    // Elimina un cliente por id, con confirmación
+    const eliminarCliente = (id) => {
+        if (!window.confirm('¿Seguro que deseas eliminar este cliente?')) return;
+        try {
+            const guardados = localStorage.getItem('clientes');
+            const clientesArray = guardados ? JSON.parse(guardados) : [];
+            const nuevos = clientesArray.filter(c => c.id !== id);
+            localStorage.setItem('clientes', JSON.stringify(nuevos));
+            setClientes(nuevos);
+        } catch (error) {
+            setError('Error al eliminar el cliente');
         }
     };
 
-    const handleVerDetalle = (id) => {
-        navigate(`/clientes/${id}`);
-    };
-
-    const handleEditar = (id) => {
-        navigate(`/clientes/editar/${id}`);
-    };
+    // Navega al detalle del cliente
+    const verDetalleCliente = (id) => navigate(`/clientes/${id}`);
+    // Navega a la edición del cliente
+    const editarCliente = (id) => navigate(`/clientes/editar/${id}`);
+    // Navega al formulario de agregar cliente
+    const agregarCliente = () => navigate('/clientes/agregar');
 
     return (
         <div className="clientes-container">
             <div className="header-clientes">
                 <h1>Clientes</h1>
-                <button className="btn-agregar" onClick={() => navigate('/clientes/agregar')}>
+                <button className="btn-agregar" onClick={agregarCliente}>
                     <FaPlus /> Agregar Cliente
                 </button>
             </div>
@@ -81,9 +85,9 @@ export default function ListaClientes() {
                                     <td>{cliente.correo}</td>
                                     <td>{cliente.cuit}</td>
                                     <td>
-                                        <button className="btn-ver" title="Ver Detalle" onClick={() => handleVerDetalle(cliente.id)}><FaEye /></button>
-                                        <button className="btn-editar" title="Editar" onClick={() => handleEditar(cliente.id)}><FaEdit /></button>
-                                        <button className="btn-eliminar" title="Eliminar" onClick={() => handleEliminar(cliente.id)}><FaTrash /></button>
+                                        <button className="btn-ver" title="Ver Detalle" onClick={() => verDetalleCliente(cliente.id)}><FaEye /></button>
+                                        <button className="btn-editar" title="Editar" onClick={() => editarCliente(cliente.id)}><FaEdit /></button>
+                                        <button className="btn-eliminar" title="Eliminar" onClick={() => eliminarCliente(cliente.id)}><FaTrash /></button>
                                     </td>
                                 </tr>
                             ))

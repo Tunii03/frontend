@@ -7,15 +7,20 @@ import './DetallePedido.css';
 export default function DetallePedido() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estado para el pedido actual
     const [pedido, setPedido] = useState(null);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(true);
 
+    // Carga el pedido al montar o cambiar el id
     useEffect(() => {
         cargarPedido();
         // eslint-disable-next-line
     }, [id]);
 
+    // Busca el pedido por id en localStorage
     const cargarPedido = () => {
         setLoading(true);
         setError(null);
@@ -36,6 +41,7 @@ export default function DetallePedido() {
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return (
             <div className="detalle-pedido">
                 <div className="text-center">
@@ -48,6 +54,7 @@ export default function DetallePedido() {
     }
 
     if (error) {
+        // Muestra errores y un mensaje
         return (
             <div className="detalle-pedido">
                 <div className="pedido-no-encontrado">

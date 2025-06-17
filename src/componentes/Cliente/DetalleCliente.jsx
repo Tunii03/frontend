@@ -5,15 +5,20 @@ import './DetalleCliente.css';
 export default function DetalleCliente() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estado para el cliente actual
     const [cliente, setCliente] = useState(null);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(true);
 
+    // Carga el cliente al montar o cambiar el id
     useEffect(() => {
         cargarCliente();
         // eslint-disable-next-line
     }, [id]);
 
+    // Busca el cliente por id en localStorage
     const cargarCliente = () => {
         setLoading(true);
         setError(null);
@@ -34,6 +39,7 @@ export default function DetalleCliente() {
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return (
             <div className="detalle-cliente">
                 <div className="text-center">
@@ -44,6 +50,7 @@ export default function DetalleCliente() {
     }
 
     if (error) {
+        // Muestra errores y un botón para volver
         return (
             <div className="detalle-cliente">
                 <div className="info-cliente">

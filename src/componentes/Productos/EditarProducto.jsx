@@ -5,6 +5,7 @@ import './ListaProductos.css';
 export default function EditarProducto() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [stock, setStock] = useState("");
     const [descripcion, setDescripcion] = useState("");
@@ -12,11 +13,13 @@ export default function EditarProducto() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Carga el producto al montar o cambiar el id
     useEffect(() => {
         cargarProducto();
         // eslint-disable-next-line
     }, [id]);
 
+    // Busca el producto por id en localStorage y setea los campos
     const cargarProducto = () => {
         setLoading(true);
         setError(null);
@@ -39,14 +42,17 @@ export default function EditarProducto() {
         }
     };
 
+    // Maneja el envío del formulario para editar el producto
     const handleSubmit = (e) => {
         e.preventDefault();
         setError(null);
+        // Validación simple de campos obligatorios
         if (!nombre || !stock || !descripcion || !precio) {
             setError('Todos los campos son obligatorios');
             return;
         }
         try {
+            // Actualiza el producto en localStorage
             const guardados = localStorage.getItem('productos');
             let productos = guardados ? JSON.parse(guardados) : [];
             productos = productos.map(p =>
@@ -62,10 +68,12 @@ export default function EditarProducto() {
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return <div className="formulario"><span>Cargando...</span></div>;
     }
 
     if (error) {
+        // Muestra errores y un mensaje
         return <div className="formulario"><div className="alert alert-danger">{error}</div></div>;
     }
 
