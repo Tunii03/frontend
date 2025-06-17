@@ -4,7 +4,6 @@ import AgregarProducto from './AgregarProducto';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
-import productosEjemplo from './productos.json';
 import './ListaProductos.css';
 
 export default function ListaProductos() {
@@ -14,8 +13,7 @@ export default function ListaProductos() {
             const arr = JSON.parse(guardados);
             if (Array.isArray(arr) && arr.length > 0) return arr;
         }
-        localStorage.setItem('productos', JSON.stringify(productosEjemplo));
-        return productosEjemplo;
+        return [];
     });
     const [mostrarModal, setMostrarModal] = useState(false);
     const [busqueda, setBusqueda] = useState('');
@@ -47,9 +45,9 @@ export default function ListaProductos() {
         <div className="lista-productos">
             <div className="header-productos">
                 <div className="titulo-productos">
-                    <h1>Productos. Anotacion: donde guardar imagen en la base de datos</h1>
+                    <h1>Catálogo de Productos</h1>
                     <Button className="btn-mas" variant="outline-dark" onClick={() => setMostrarModal(true)} title="Agregar producto">
-                        <FaPlus size={32} />
+                        <FaPlus size={24} />
                     </Button>
                 </div>
                 <div className="busqueda-productos">

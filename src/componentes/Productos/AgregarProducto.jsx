@@ -37,10 +37,6 @@ export default function AgregarProducto({ onProductoAgregado }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!imagen) {
-            setErrorImagen('Selecciona una imagen');
-            return;
-        }
         onProductoAgregado({
             nombre,
             precio: Number(precio),

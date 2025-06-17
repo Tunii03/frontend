@@ -19,6 +19,7 @@ export default function NavbarComponent() {
                         <Nav.Link as={Link} to="/clientes">Clientes</Nav.Link>
                         <Nav.Link as={Link} to="/pedidos">Pedidos</Nav.Link>
                         <Nav.Link as={Link} to="/presupuestos">Presupuestos</Nav.Link>
+                        <Nav.Link as={Link} to="/pago">Pago</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

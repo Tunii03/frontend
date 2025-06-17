@@ -12,6 +12,11 @@ import AgregarCliente from './componentes/Cliente/AgregarCliente.jsx';
 import DetalleCliente from './componentes/Cliente/DetalleCliente.jsx';
 import ListaClientes from './componentes/Cliente/ListaClientes.jsx';
 import EditarCliente from './componentes/Cliente/EditarCliente.jsx';
+import ListaPresupuestos from './componentes/Presupuestos/ListaPresupuestos.jsx';
+import AgregarPresupuesto from './componentes/Presupuestos/AgregarPresupuesto.jsx';
+import DetallePresupuesto from './componentes/Presupuestos/DetallePresupuesto.jsx';
+import ListaPagos from './componentes/Pagos/ListaPagos.jsx';
+import AgregarPago from './componentes/Pagos/AgregarPago.jsx';
 
 function App() {
   return (
@@ -31,7 +36,11 @@ function App() {
             <Route path='/pedidos' element={<Pedidos />} />
             <Route path='/pedidos/editar/:id' element={<EditarPedido />} />
             <Route path='/pedidos/:id' element={<DetallePedido />} />
-            <Route path='/presupuestos' element={<div>Página de Presupuestos</div>} />
+            <Route path='/presupuestos' element={<ListaPresupuestos />} />
+            <Route path='/presupuestos/agregar' element={<AgregarPresupuesto />} />
+            <Route path='/presupuestos/:id' element={<DetallePresupuesto />} />
+            <Route path='/pago' element={<ListaPagos />} />
+            <Route path='/pago/agregar' element={<AgregarPago />} />
           </Routes>
         </main>
       </div>
