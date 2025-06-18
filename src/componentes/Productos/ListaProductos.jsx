@@ -34,9 +34,32 @@ export default function ListaProductos() {
     };
 
     // Agrega un nuevo producto a la lista (recarga desde la API)
-    const agregarProducto = () => {
+    const agregarProducto = async (nuevoProducto) => {
         setMostrarModal(false);
-        cargarProductos();
+        
+        console.log('Producto recibido:', nuevoProducto);
+        console.log('Productos actuales:', productos);
+        
+        // Si recibimos el producto creado, lo agregamos inmediatamente al estado
+        if (nuevoProducto) {
+            // Simulamos un ID temporal mientras se recarga desde la API
+            const productoConId = {
+                ...nuevoProducto,
+                id: `temp_${Date.now()}_${Math.random()}` // ID temporal más único
+            };
+            console.log('Producto con ID temporal:', productoConId);
+            
+            setProductos(prevProductos => {
+                const nuevosProductos = [...prevProductos, productoConId];
+                console.log('Nuevos productos:', nuevosProductos);
+                return nuevosProductos;
+            });
+        }
+        
+        // Recargamos desde la API para obtener el ID real y asegurar sincronización
+        setTimeout(() => {
+            cargarProductos();
+        }, 1000); // Aumentamos el tiempo para dar más margen
     };
 
     // Elimina un producto por id usando la API
@@ -59,6 +82,8 @@ export default function ListaProductos() {
     const productosFiltrados = productos.filter(p =>
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
+
+    console.log('Productos filtrados para render:', productosFiltrados);
 
     return (
         <div className="lista-productos">

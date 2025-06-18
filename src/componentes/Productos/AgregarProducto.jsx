@@ -39,31 +39,36 @@ export default function AgregarProducto({ onProductoAgregado }) {
     // Maneja el envío del formulario para agregar un producto
     const handleSubmit = async (e) => {
         e.preventDefault();
-        onProductoAgregado({
-            nombre,
-            precio: Number(precio),
-            stock: Number(stock),
-            descripcion,
-            imagen: imagenPreview
-        });
-        if (imagenPreview) {
-            const clave = `imagen_producto_${Date.now()}`;
-            localStorage.setItem(clave, imagenPreview);
-        }
         
         try{
             await crearProducto(nombre,stock,descripcion,precio);
+            
+            // Solo llamar onProductoAgregado después de que se complete exitosamente la creación
+            onProductoAgregado({
+                nombre,
+                precio: Number(precio),
+                stock: Number(stock),
+                descripcion,
+                imagen: imagenPreview
+            });
+            
+            if (imagenPreview) {
+                const clave = `imagen_producto_${Date.now()}`;
+                localStorage.setItem(clave, imagenPreview);
+            }
+            
+            // Limpiar el formulario
+            setNombre('');
+            setPrecio(0);
+            setStock(0);
+            setDescripcion('');
+            setImagen(null);
+            setImagenPreview('');
+            setErrorImagen('');
         }
         catch (error){
             console.log(error)
         }
-        setNombre('');
-        setPrecio(0);
-        setStock(0);
-        setDescripcion('');
-        setImagen(null);
-        setImagenPreview('');
-        setErrorImagen('');
     };
 
     return (

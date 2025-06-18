@@ -7,32 +7,34 @@ import axios from 'axios'
             descripcion:descripcion,
             precio: precio
         }
-        axios.post('http://localhost:8080/api/producto',datos)
+        return axios.post('http://localhost:8080/api/producto',datos)
         .then(function(response){
             console.log(response)
+            return response
         })
         .catch(function(error){
             console.log(error)
+            throw error
         })
     }
     export function buscarProductos(){
-        const [productos, setProductos] = useState([])
-        axios.get(`http://localhost:8080/api/producto`)
-        .then((data)=>{
-            setProductos(data)
+        return axios.get(`http://localhost:8080/api/producto`)
+        .then((response)=>{
+            return response
         })
         .catch((error)=>{
             console.log(error)
+            throw error
         })
     }
     export function mostrarProducto({id}){
-        const [producto,setProducto] = useState([])
-        axios.get(`http://localhost:8080/api/producto/${id}`)
-         .then((data)=>{
-            setProducto(data)
+        return axios.get(`http://localhost:8080/api/producto/${id}`)
+         .then((response)=>{
+            return response
         })
         .catch((error)=>{
             console.log(error)
+            throw error
         })
     }
     export function actualizarProducto({id,nombre,stock,descripcion,precio}){
@@ -42,20 +44,24 @@ import axios from 'axios'
             descripcion:descripcion,
             precio: precio
         }
-        axios.put(`http://localhost:8080/api/producto/${id}`,datos)
+        return axios.put(`http://localhost:8080/api/producto/${id}`,datos)
         .then(function(response){
             console.log(response)
+            return response
         })
         .catch(function(error){
             console.log(error)
+            throw error
         })
     }
     export function borrarProducto ({id}){
-        axios.delete(`http://localhost:8080/api/producto/${id}`)
+        return axios.delete(`http://localhost:8080/api/producto/${id}`)
         .then(function(response){
             console.log(response)
+            return response
         })
         .catch(function(error){
             console.log(error)
+            throw error
         })
     }
