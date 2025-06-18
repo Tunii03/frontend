@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
 import clienteEjemplo from './cliente.json';
+import './DetalleCliente.css';
+
 
 export default function DetalleCliente() {
     const [clientes, setClientes] = useState( () => {

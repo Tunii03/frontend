@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { crearCliente } from "../../pages/Cliente";
+import './AgregarCliente.css';
 
 export default function AgregarCliente({ onClienteAgregado }) {
     const [nombre, setNombre] = useState("");
