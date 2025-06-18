@@ -1,51 +1,79 @@
-import React, { useState } from 'react';
-<<<<<<< HEAD
-import { crearCliente } from "../../pages/Cliente";
-=======
-import { useNavigate } from 'react-router-dom';
-import { crearCliente } from '../../pages/Cliente';
->>>>>>> a6009bd2f6a8a4016664ecb85c07dd65cb89d8c1
-import './AgregarCliente.css';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import './EditarCliente.css';
+import { mostrarClientes, actualizarCliente } from '../../pages/Cliente';
 
-export default function AgregarCliente() {
+export default function EditarCliente() {
+    const { id } = useParams();
+    const navigate = useNavigate();
     // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [correo, setCorreo] = useState("");
     const [cuit, setCuit] = useState("");
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
-    // Maneja el envío del formulario para agregar un cliente
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // Carga los datos del cliente al montar o cambiar el id
+    useEffect(() => {
+        cargarCliente();
+    }, [id]);
+
+    const cargarCliente = async () => {
         setLoading(true);
         setError(null);
-        // Validación simple de campos obligatorios
-        if (!nombre || !razonSocial || !correo || !cuit) {
-            setError('Todos los campos son obligatorios');
-            setLoading(false);
-            return;
-        }
         try {
-            await crearCliente(nombre, razonSocial, correo, cuit);
-            navigate('/clientes');
+            const response = await mostrarClientes({ id });
+            const cliente = response.data;
+            if (cliente) {
+                setNombre(cliente.nombre);
+                setRazonSocial(cliente.razonSocial);
+                setCorreo(cliente.correo);
+                setCuit(cliente.cuit);
+            } else {
+                setError('No se encontró el cliente');
+            }
         } catch (error) {
-            setError('Error al guardar el cliente');
+            setError('Error al cargar el cliente');
         } finally {
             setLoading(false);
         }
     };
 
+    // Maneja el envío del formulario para editar el cliente
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
+        // Validación simple de campos obligatorios
+        if (!nombre || !razonSocial || !correo || !cuit) {
+            setError('Todos los campos son obligatorios');
+            return;
+        }
+        try {
+            await actualizarCliente({
+                id,
+                nombre,
+                razonSocial,
+                correo,
+                cuit: Number(cuit)
+            });
+            navigate('/clientes');
+        } catch (error) {
+            setError('Error al guardar los cambios');
+        }
+    };
+
+    if (loading) {
+        return <div className="formulario"><span>Cargando...</span></div>;
+    }
+
+    if (error) {
+        return <div className="formulario"><div className="alert alert-danger">{error}</div></div>;
+    }
+
     return (
         <form onSubmit={handleSubmit} className="formulario">
-            {error && (
-                <div className="alert alert-danger" role="alert">
-                    {error}
-                </div>
-            )}
-
+            <h2>Editar Cliente</h2>
             <div className="form-group">
                 <label htmlFor="nombre">Nombre:</label>
                 <input
@@ -54,10 +82,8 @@ export default function AgregarCliente() {
                     value={nombre}
                     onChange={e => setNombre(e.target.value)}
                     required
-                    placeholder="Ingrese el nombre del cliente"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="razonSocial">Razón social:</label>
                 <input
@@ -66,10 +92,8 @@ export default function AgregarCliente() {
                     value={razonSocial}
                     onChange={e => setRazonSocial(e.target.value)}
                     required
-                    placeholder="Ingrese la razón social"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="correo">Correo electrónico:</label>
                 <input
@@ -78,10 +102,8 @@ export default function AgregarCliente() {
                     value={correo}
                     onChange={e => setCorreo(e.target.value)}
                     required
-                    placeholder="Ingrese el correo electrónico"
                 />
             </div>
-
             <div className="form-group">
                 <label htmlFor="cuit">CUIT:</label>
                 <input
@@ -90,18 +112,10 @@ export default function AgregarCliente() {
                     value={cuit}
                     onChange={e => setCuit(e.target.value)}
                     required
-                    placeholder="Ingrese el CUIT"
                 />
             </div>
-
-            <button 
-                type="submit" 
-                className="btn-submit"
-                disabled={loading}
-            >
-                {loading ? 'Guardando...' : 'Agregar Cliente'}
-            </button>
+            <button type="submit" className="btn-submit">Guardar Cambios</button>
+            <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/clientes')}>Cancelar</button>
         </form>
     );
-}
-
+} 

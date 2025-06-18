@@ -10,7 +10,7 @@ export default function NavbarComponent() {
         <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
             <Container>
                 <Navbar.Brand as={Link} to="/" className="brand">
-                    Sistema de Gestión
+                    Tunitos ERP
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
@@ -19,6 +19,7 @@ export default function NavbarComponent() {
                         <Nav.Link as={Link} to="/clientes">Clientes</Nav.Link>
                         <Nav.Link as={Link} to="/pedidos">Pedidos</Nav.Link>
                         <Nav.Link as={Link} to="/presupuestos">Presupuestos</Nav.Link>
+                        <Nav.Link as={Link} to="/pago">Pago</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

@@ -16,9 +16,9 @@ import axios from 'axios'
     }
     export function buscarPagos(){
         const [pagos, setPagos] = useState([])
-        axios.get(`http://localhost:8080/api/pagos`)
+        axios.get(`http://localhost:8080/api/pago`)
         .then((data)=>{
-            setPresupuesto(data)
+            setPagos(data)
         })
         .catch((error)=>{
             console.log(error)

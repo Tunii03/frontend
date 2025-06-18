@@ -4,42 +4,59 @@ import AgregarProducto from './AgregarProducto';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
-import productosEjemplo from './productos.json';
 import './ListaProductos.css';
+import { buscarProductos, borrarProducto } from '../../pages/Producto';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaProductos() {
-    const [productos, setProductos] = useState(() => {
-        const guardados = localStorage.getItem('productos');
-        if (guardados) {
-            const arr = JSON.parse(guardados);
-            if (Array.isArray(arr) && arr.length > 0) return arr;
-        }
-        localStorage.setItem('productos', JSON.stringify(productosEjemplo));
-        return productosEjemplo;
-    });
+    // Estado para la lista de productos
+    const [productos, setProductos] = useState([]);
+    // Estado para mostrar el modal de agregar producto
     const [mostrarModal, setMostrarModal] = useState(false);
+    // Estado para la búsqueda
     const [busqueda, setBusqueda] = useState('');
     const navigate = useNavigate();
+    const { titulo, setTitulo } = useTitulo();
 
+    // Carga los productos desde la API al montar
     useEffect(() => {
-        localStorage.setItem('productos', JSON.stringify(productos));
-    }, [productos]);
+        setTitulo('Productos');
+        cargarProductos();
+    }, [setTitulo]);
 
-    const agregarProducto = (nuevo) => {
-        setProductos([...productos, { ...nuevo, id: Date.now() }]);
+    const cargarProductos = async () => {
+        try {
+            const response = await buscarProductos();
+            setProductos(response.data);
+        } catch (error) {
+            setProductos([]);
+        }
+    };
+
+    // Agrega un nuevo producto a la lista (recarga desde la API)
+    const agregarProducto = () => {
         setMostrarModal(false);
+        cargarProductos();
     };
 
-    const eliminarProducto = (e, id) => {
+    // Elimina un producto por id usando la API
+    const eliminarProducto = async (e, id) => {
         e.stopPropagation();
-        setProductos(productos.filter(p => p.id !== id));
+        try {
+            await borrarProducto({ id });
+            setProductos(productos.filter(p => p.id !== id));
+        } catch (error) {
+            // Manejo de error opcional
+        }
     };
 
+    // Navega al detalle del producto
     const verDetalle = (id) => {
         navigate(`/productos/${id}`);
     };
 
-    const filtrados = productos.filter(p =>
+    // Filtra productos por nombre según la búsqueda
+    const productosFiltrados = productos.filter(p =>
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
 
@@ -47,9 +64,9 @@ export default function ListaProductos() {
         <div className="lista-productos">
             <div className="header-productos">
                 <div className="titulo-productos">
-                    <h1>Productos. Anotacion: donde guardar imagen en la base de datos</h1>
+                    <h1>{titulo}</h1>
                     <Button className="btn-mas" variant="outline-dark" onClick={() => setMostrarModal(true)} title="Agregar producto">
-                        <FaPlus size={32} />
+                        <FaPlus size={24} />
                     </Button>
                 </div>
                 <div className="busqueda-productos">
@@ -63,10 +80,10 @@ export default function ListaProductos() {
                 </div>
             </div>
             <div className="catalogo-productos">
-                {filtrados.length === 0 ? (
+                {productosFiltrados.length === 0 ? (
                     <p className="no-productos">No hay productos en el catálogo</p>
                 ) : (
-                    filtrados.map((p) => (
+                    productosFiltrados.map((p) => (
                         <div
                             key={p.id}
                             className="producto-item"

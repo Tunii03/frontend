@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './AgregarProducto.css';
-import {crearProducto} from  '../../pages/Producto.js';
-
+import { crearProducto } from '../../pages/Producto.js';
 
 export default function AgregarProducto({ onProductoAgregado }) {
+    // Estados para los campos del formulario
     const [nombre, setNombre] = useState('');
     const [precio, setPrecio] = useState(0);
     const [stock, setStock] = useState(0);
@@ -12,6 +12,7 @@ export default function AgregarProducto({ onProductoAgregado }) {
     const [imagenPreview, setImagenPreview] = useState('');
     const [errorImagen, setErrorImagen] = useState('');
 
+    // Maneja la carga y validación de la imagen
     const handleImagen = (e) => {
         const file = e.target.files[0];
         setErrorImagen('');
@@ -35,12 +36,9 @@ export default function AgregarProducto({ onProductoAgregado }) {
         }
     };
 
+    // Maneja el envío del formulario para agregar un producto
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!imagen) {
-            setErrorImagen('Selecciona una imagen');
-            return;
-        }
         onProductoAgregado({
             nombre,
             precio: Number(precio),
@@ -48,6 +46,11 @@ export default function AgregarProducto({ onProductoAgregado }) {
             descripcion,
             imagen: imagenPreview
         });
+        if (imagenPreview) {
+            const clave = `imagen_producto_${Date.now()}`;
+            localStorage.setItem(clave, imagenPreview);
+        }
+        
         try{
             await crearProducto(nombre,stock,descripcion,precio);
         }

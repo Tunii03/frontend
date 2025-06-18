@@ -2,35 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Table, Alert, Spinner } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
-import { obtenerPedido } from '../../pages/Pedido';
 import './DetallePedido.css';
+import { obtenerPedido } from '../../pages/Pedido';
 
 export default function DetallePedido() {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Estado para el pedido actual
     const [pedido, setPedido] = useState(null);
+    // Estado para errores
     const [error, setError] = useState(null);
+    // Estado para loading
     const [loading, setLoading] = useState(true);
 
+    // Carga el pedido al montar o cambiar el id
     useEffect(() => {
         cargarPedido();
     }, [id]);
 
+    // Busca el pedido por id en la API
     const cargarPedido = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            setError(null);
-            const data = await obtenerPedido(id);
-            setPedido(data);
+            const pedidoEncontrado = await obtenerPedido(id);
+            if (pedidoEncontrado) {
+                setPedido(pedidoEncontrado);
+            } else {
+                setError('No se encontró el pedido');
+            }
         } catch (error) {
-            setError(error.message || 'Error al cargar el pedido');
-            console.error('Error:', error);
+            setError('Error al cargar el pedido');
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) {
+        // Muestra un mensaje de carga
         return (
             <div className="detalle-pedido">
                 <div className="text-center">
@@ -43,6 +52,7 @@ export default function DetallePedido() {
     }
 
     if (error) {
+        // Muestra errores y un mensaje
         return (
             <div className="detalle-pedido">
                 <div className="pedido-no-encontrado">
@@ -58,18 +68,7 @@ export default function DetallePedido() {
     }
 
     if (!pedido) {
-        return (
-            <div className="detalle-pedido">
-                <div className="pedido-no-encontrado">
-                    <Alert variant="warning">
-                        No se encontró el pedido
-                    </Alert>
-                    <Button variant="primary" onClick={() => navigate('/pedidos')}>
-                        Volver a Pedidos
-                    </Button>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (
@@ -86,7 +85,7 @@ export default function DetallePedido() {
                     <div className="info-cliente">
                         <h3>Información del Cliente</h3>
                         <p><strong>Cliente:</strong> {pedido.cliente}</p>
-                        <p><strong>Fecha:</strong> {new Date(pedido.fecha).toLocaleDateString()}</p>
+                        <p><strong>Fecha:</strong> {pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : ''}</p>
                     </div>
 
                     <div className="productos-pedido">
@@ -101,7 +100,7 @@ export default function DetallePedido() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {pedido.productos.map((producto, index) => (
+                                {pedido.productos && pedido.productos.map((producto, index) => (
                                     <tr key={index}>
                                         <td>{producto.nombre}</td>
                                         <td>{producto.cantidad}</td>

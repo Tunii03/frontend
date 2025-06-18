@@ -16,6 +16,16 @@ import axios from 'axios'
             console.log(error)
         })
     }
+    export function buscarClientes(){
+        const [clientes, setClientes] = useState([])
+        axios.get(`http://localhost:8080/api/cliente`)
+        .then((data)=>{
+            setClientes(data)
+        })
+        .catch((error)=>{
+            console.log(error)
+        })
+    }
 
     export function mostrarClientes({id}){
         const [cliente,setCliente] = useState([])

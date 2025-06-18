@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import AgregarCliente from './AgregarCliente';
@@ -7,124 +8,83 @@ import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
 import clienteEjemplo from './cliente.json';
 import './DetalleCliente.css';
 
+=======
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import './DetalleCliente.css';
+import { mostrarClientes } from '../../pages/Cliente';
+>>>>>>> a6009bd2f6a8a4016664ecb85c07dd65cb89d8c1
 
 export default function DetalleCliente() {
-    const [clientes, setClientes] = useState( () => {
-        const guardados = localStorage.getItem('cliente');
-        if (guardados) {
-            const arr = JSON.parse(guardados);
-            if (Array.isArray(arr) && arr.length > 0) return arr;
-        }
-        localStorage.setItem('cliente', JSON.stringify(clienteEjemplo));
-        return clienteEjemplo;
-        });
-    const [mostrarModal, setMostrarModal] = useState(false);
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [editando, setEditando] = useState(null);
-    const [formData, setFormData] = useState({
-        nombre: '',
-        razonSocial: '',
-        correo: '',
-        cuit: ''
-    });
+    // Estado para el cliente actual
+    const [cliente, setCliente] = useState(null);
+    // Estado para errores
+    const [error, setError] = useState(null);
+    // Estado para loading
+    const [loading, setLoading] = useState(true);
 
+    // Carga el cliente al montar o cambiar el id
     useEffect(() => {
-        localStorage.setItem('clientes', JSON.stringify(clientes));
-    }, [clientes]);
+        cargarCliente();
+    }, [id]);
 
-    const AgregarNuevoCliente = (nuevo) => {
-        setClientes([...clientes, { ...nuevo, id: Date.now() }]);
-        setMostrarModal(false);
+    const cargarCliente = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await mostrarClientes({ id });
+            const encontrado = response.data;
+            if (encontrado) {
+                setCliente(encontrado);
+            } else {
+                setError('No se encontró el cliente');
+            }
+        } catch (error) {
+            setError('Error al cargar el cliente');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const eliminarCliente = (e, id) => {
-        e.stopPropagation();
-        setClientes(clientes.filter(c => c.id !== id));
-    };
-
-    const comenzarEdicion = (cliente) => {
-        setEditando(cliente.id);
-        setFormData({
-            nombre: cliente.nombre,
-            razonSocial: cliente.razonSocial,
-            correo: cliente.correo,
-            cuit: cliente.cuit
-        });
-    };
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const confirmarEdicion = (e) => {
-        e.preventDefault();
-        actualizarCliente({ id: editando, ...formData });
-        setClientes(clientes.map(c =>
-            c.id === editando ? { ...c, ...formData } : c
-        ));
-        setEditando(null);
-    };
-
-
-    return (
-        <div className="lista-clientes">
-            <div className="header-clientes">
-                <div className="titulo-clientes">
-                    <h1>Clientes</h1>
-                    <Button variant="outline-dark" onClick={() => setMostrarModal(true)} title="Agregar cliente">
-                        <FaPlus size={32} />
-                    </Button>
+    if (loading) {
+        // Muestra un mensaje de carga
+        return (
+            <div className="detalle-cliente">
+                <div className="text-center">
+                    <span>Cargando...</span>
                 </div>
             </div>
+        );
+    }
 
-            <div className="catalogo-clientes">
-                {clientes.length === 0 ? (
-                    <p className="no-clientes">No hay clientes disponibles</p>
-                ) : (
-                    clientes.map((c) => (
-                        <div key={c.id} className="cliente-item">
-                            <button
-                                className="btn-eliminar-cliente"
-                                title="Eliminar cliente"
-                                onClick={e => eliminarCliente(e, c.id)}
-                            >
-                                <FaTrash />
-                            </button>
-                            <div className="cliente-info">
-                                {editando === c.id ? (
-                                    <form onSubmit={confirmarEdicion} className="form-edicion">
-                                        <input name="nombre" value={formData.nombre} onChange={handleChange} />
-                                        <input name="razonSocial" value={formData.razonSocial} onChange={handleChange} />
-                                        <input name="correo" value={formData.correo} onChange={handleChange} />
-                                        <input name="cuit" value={formData.cuit} onChange={handleChange} />
-                                        <button type="submit">Guardar</button>
-                                        <button type="button" onClick={() => setEditando(null)}>Cancelar</button>
-                                    </form>
-                                ) : (
-                                    <>
-                                        <strong>{c.nombre}</strong>
-                                        <p>Razón Social: {c.razonSocial}</p>
-                                        <p>Correo: {c.correo}</p>
-                                        <p>CUIT: {c.cuit}</p>
-                                        <button className="btn-editar-cliente" onClick={() => comenzarEdicion(c)}>
-                                            Editar
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    ))
-                )}
+    if (error) {
+        // Muestra errores y un botón para volver
+        return (
+            <div className="detalle-cliente">
+                <div className="info-cliente">
+                    <div className="alert alert-danger">{error}</div>
+                    <button className="btn-volver" onClick={() => navigate('/clientes')}>Volver a Clientes</button>
+                </div>
             </div>
+        );
+    }
 
-            <Modal show={mostrarModal} onHide={() => setMostrarModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Agregar Nuevo Cliente</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <AgregarCliente onClienteAgregado={AgregarNuevoCliente} />
-                </Modal.Body>
-            </Modal>
+    if (!cliente) return null;
+
+    return (
+        <div className="detalle-cliente">
+            <div className="header-cliente">
+                <h1>Detalle del Cliente</h1>
+                <button className="btn-volver" onClick={() => navigate('/clientes')}>Volver a Clientes</button>
+            </div>
+            <div className="info-cliente">
+                <h3>{cliente.nombre}</h3>
+                <p><strong>Razón Social:</strong> {cliente.razonSocial}</p>
+                <p><strong>Correo:</strong> {cliente.correo}</p>
+                <p><strong>CUIT:</strong> {cliente.cuit}</p>
+            </div>
         </div>
     );
 }
