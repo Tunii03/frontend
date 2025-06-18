@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ListaClientes.css';
-import { FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { buscarClientes, borrarCliente } from '../../pages/Cliente';
 import { useTitulo } from '../../context/TituloContext';
 
@@ -46,8 +46,6 @@ export default function ListaClientes() {
         }
     };
 
-    // Navega al detalle del cliente
-    const verDetalleCliente = (id) => navigate(`/clientes/${id}`);
     // Navega a la edición del cliente
     const editarCliente = (id) => navigate(`/clientes/editar/${id}`);
     // Navega al formulario de agregar cliente
@@ -58,7 +56,7 @@ export default function ListaClientes() {
             <div className="header-clientes">
                 <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarCliente}>
-                    <FaPlus /> +
+                    <FaPlus /> 
                 </button>
             </div>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -86,7 +84,6 @@ export default function ListaClientes() {
                                     <td>{cliente.email}</td>
                                     <td>{cliente.cuit}</td>
                                     <td>
-                                        <button className="btn-ver" title="Ver Detalle" onClick={() => verDetalleCliente(cliente.id)}><FaEye /></button>
                                         <button className="btn-editar" title="Editar" onClick={() => editarCliente(cliente.id)}><FaEdit /></button>
                                         <button className="btn-eliminar" title="Eliminar" onClick={() => eliminarCliente(cliente.id)}><FaTrash /></button>
                                     </td>

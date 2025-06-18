@@ -4,7 +4,6 @@ import { crearCliente } from '../../pages/Cliente';
 import './AgregarCliente.css';
 
 export default function AgregarCliente() {
-    // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [email, setEmail] = useState("");
@@ -13,12 +12,10 @@ export default function AgregarCliente() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Maneja el envío del formulario para agregar un cliente
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        // Validación simple de campos obligatorios
         if (!nombre || !razonSocial || !email || !cuit) {
             setError('Todos los campos son obligatorios');
             setLoading(false);

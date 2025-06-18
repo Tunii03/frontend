@@ -6,7 +6,6 @@ import { mostrarClientes, actualizarCliente } from '../../pages/Cliente';
 export default function EditarCliente() {
     const { id } = useParams();
     const navigate = useNavigate();
-    // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
     const [email, setEmail] = useState("");
@@ -14,7 +13,6 @@ export default function EditarCliente() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Carga los datos del cliente al montar o cambiar el id
     useEffect(() => {
         cargarCliente();
     }, [id]);
@@ -23,7 +21,7 @@ export default function EditarCliente() {
         setLoading(true);
         setError(null);
         try {
-            const response = await mostrarClientes({ id });
+            const response = await mostrarClientes(id);
             const cliente = response.data;
             if (cliente) {
                 setNombre(cliente.nombre);
@@ -40,11 +38,9 @@ export default function EditarCliente() {
         }
     };
 
-    // Maneja el envío del formulario para editar el cliente
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-        // Validación simple de campos obligatorios
         if (!nombre || !razonSocial || !email || !cuit) {
             setError('Todos los campos son obligatorios');
             return;
@@ -100,7 +96,7 @@ export default function EditarCliente() {
                     type="email"
                     id="correo"
                     value={email}
-                    onChange={e => setCorreo(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     required
                 />
             </div>
@@ -115,7 +111,7 @@ export default function EditarCliente() {
                 />
             </div>
             <button type="submit" className="btn-submit">Guardar Cambios</button>
-            <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/clientes')}>Cancelar</button>
+            <button type="button" className="btn-submit">Cancelar</button>
         </form>
     );
 } 

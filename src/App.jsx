@@ -9,7 +9,6 @@ import Pedidos from './componentes/Pedidos/ListaPedidos';
 import DetallePedido from './componentes/Pedidos/DetallePedido';
 import EditarPedido from './componentes/Pedidos/EditarPedido.jsx';
 import AgregarCliente from './componentes/Cliente/AgregarCliente.jsx';
-import DetalleCliente from './componentes/Cliente/DetalleCliente.jsx';
 import ListaClientes from './componentes/Cliente/ListaClientes.jsx';
 import EditarCliente from './componentes/Cliente/EditarCliente.jsx';
 import ListaPresupuestos from './componentes/Presupuestos/ListaPresupuestos.jsx';
@@ -32,7 +31,6 @@ function App() {
             <Route path='/clientes' element={<ListaClientes />} />
             <Route path='/clientes/agregar' element={<AgregarCliente />} />
             <Route path='/clientes/editar/:id' element={<EditarCliente />} />
-            <Route path='/clientes/:id' element={<DetalleCliente />} />
             <Route path='/pedidos' element={<Pedidos />} />
             <Route path='/pedidos/editar/:id' element={<EditarPedido />} />
             <Route path='/pedidos/:id' element={<DetallePedido />} />
