@@ -9,7 +9,7 @@ export default function EditarCliente() {
     // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
-    const [correo, setCorreo] = useState("");
+    const [email, setEmail] = useState("");
     const [cuit, setCuit] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function EditarCliente() {
             if (cliente) {
                 setNombre(cliente.nombre);
                 setRazonSocial(cliente.razonSocial);
-                setCorreo(cliente.correo);
+                setEmail(cliente.email);
                 setCuit(cliente.cuit);
             } else {
                 setError('No se encontró el cliente');
@@ -45,7 +45,7 @@ export default function EditarCliente() {
         e.preventDefault();
         setError(null);
         // Validación simple de campos obligatorios
-        if (!nombre || !razonSocial || !correo || !cuit) {
+        if (!nombre || !razonSocial || !email || !cuit) {
             setError('Todos los campos son obligatorios');
             return;
         }
@@ -54,7 +54,7 @@ export default function EditarCliente() {
                 id,
                 nombre,
                 razonSocial,
-                correo,
+                email,
                 cuit: Number(cuit)
             });
             navigate('/clientes');
@@ -99,7 +99,7 @@ export default function EditarCliente() {
                 <input
                     type="email"
                     id="correo"
-                    value={correo}
+                    value={email}
                     onChange={e => setCorreo(e.target.value)}
                     required
                 />

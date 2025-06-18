@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { crearCliente } from "../../pages/Cliente";
-=======
 import { useNavigate } from 'react-router-dom';
 import { crearCliente } from '../../pages/Cliente';
->>>>>>> a6009bd2f6a8a4016664ecb85c07dd65cb89d8c1
 import './AgregarCliente.css';
 
 export default function AgregarCliente() {
     // Estados para los campos del formulario
     const [nombre, setNombre] = useState("");
     const [razonSocial, setRazonSocial] = useState("");
-    const [correo, setCorreo] = useState("");
+    const [email, setEmail] = useState("");
     const [cuit, setCuit] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -23,13 +19,13 @@ export default function AgregarCliente() {
         setLoading(true);
         setError(null);
         // Validación simple de campos obligatorios
-        if (!nombre || !razonSocial || !correo || !cuit) {
+        if (!nombre || !razonSocial || !email || !cuit) {
             setError('Todos los campos son obligatorios');
             setLoading(false);
             return;
         }
         try {
-            await crearCliente(nombre, razonSocial, correo, cuit);
+            await crearCliente(nombre, razonSocial, email, cuit);
             navigate('/clientes');
         } catch (error) {
             setError('Error al guardar el cliente');
@@ -75,8 +71,8 @@ export default function AgregarCliente() {
                 <input
                     type="email"
                     id="correo"
-                    value={correo}
-                    onChange={e => setCorreo(e.target.value)}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="Ingrese el correo electrónico"
                 />

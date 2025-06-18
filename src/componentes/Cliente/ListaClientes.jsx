@@ -58,7 +58,7 @@ export default function ListaClientes() {
             <div className="header-clientes">
                 <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarCliente}>
-                    <FaPlus /> Agregar Cliente
+                    <FaPlus /> +
                 </button>
             </div>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -83,7 +83,7 @@ export default function ListaClientes() {
                                 <tr key={cliente.id}>
                                     <td>{cliente.nombre}</td>
                                     <td>{cliente.razonSocial}</td>
-                                    <td>{cliente.correo}</td>
+                                    <td>{cliente.email}</td>
                                     <td>{cliente.cuit}</td>
                                     <td>
                                         <button className="btn-ver" title="Ver Detalle" onClick={() => verDetalleCliente(cliente.id)}><FaEye /></button>

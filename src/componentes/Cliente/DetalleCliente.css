@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .lista-clientes {
     max-width: 1200px;
     margin: 0 auto;
@@ -209,7 +208,7 @@
         font-size: 0.9rem;
     }
 }
-=======
+
 .detalle-cliente {
     max-width: 1200px;
     margin: 0 auto;
@@ -340,4 +339,4 @@
         overflow-x: auto;
     }
 } 
->>>>>>> a6009bd2f6a8a4016664ecb85c07dd65cb89d8c1
+

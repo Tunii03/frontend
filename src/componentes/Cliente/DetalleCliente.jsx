@@ -1,19 +1,7 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import AgregarCliente from './AgregarCliente';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
-import clienteEjemplo from './cliente.json';
-import './DetalleCliente.css';
-
-=======
-import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './DetalleCliente.css';
 import { mostrarClientes } from '../../pages/Cliente';
->>>>>>> a6009bd2f6a8a4016664ecb85c07dd65cb89d8c1
 
 export default function DetalleCliente() {
     const { id } = useParams();
@@ -82,7 +70,7 @@ export default function DetalleCliente() {
             <div className="info-cliente">
                 <h3>{cliente.nombre}</h3>
                 <p><strong>Razón Social:</strong> {cliente.razonSocial}</p>
-                <p><strong>Correo:</strong> {cliente.correo}</p>
+                <p><strong>Correo:</strong> {cliente.email}</p>
                 <p><strong>CUIT:</strong> {cliente.cuit}</p>
             </div>
         </div>
