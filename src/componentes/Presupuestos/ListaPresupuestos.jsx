@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaEye } from 'react-icons/fa';
+import { buscarPresupuestos } from '../../pages/Presupuesto';
 import './ListaPresupuestos.css';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaPresupuestos() {
     // Estado para la lista de presupuestos
@@ -11,19 +13,21 @@ export default function ListaPresupuestos() {
     // Estado para errores
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { titulo, setTitulo } = useTitulo();
 
     // Carga los presupuestos al montar el componente
     useEffect(() => {
+        setTitulo('Presupuestos');
         cargarPresupuestos();
     }, []);
 
-    // Obtiene los presupuestos desde localStorage
-    const cargarPresupuestos = () => {
+    // Obtiene los presupuestos desde la API
+    const cargarPresupuestos = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('presupuestos');
-            setPresupuestos(guardados ? JSON.parse(guardados) : []);
+            const response = await buscarPresupuestos();
+            setPresupuestos(response.data);
         } catch (error) {
             setError('Error al cargar los presupuestos');
         } finally {
@@ -44,7 +48,7 @@ export default function ListaPresupuestos() {
     return (
         <div className="presupuestos-container">
             <div className="header-presupuestos">
-                <h1>Presupuestos</h1>
+                <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarPresupuesto}>
                     <FaPlus /> Nuevo Presupuesto
                 </button>
@@ -70,8 +74,8 @@ export default function ListaPresupuestos() {
                             presupuestos.map(p => (
                                 <tr key={p.id}>
                                     <td>{p.id}</td>
-                                    <td>{p.idPedido}</td>
-                                    <td>{new Date(p.createdDate).toLocaleDateString()}</td>
+                                    <td>{p.pedidoId || p.idPedido}</td>
+                                    <td>{p.createdDate ? new Date(p.createdDate).toLocaleDateString() : ''}</td>
                                     <td>{p.estado ? 'Pagado' : 'Pendiente'}</td>
                                     <td>
                                         <button className="btn-ver" title="Ver Detalle" onClick={() => verDetallePresupuesto(p.id)}><FaEye /></button>

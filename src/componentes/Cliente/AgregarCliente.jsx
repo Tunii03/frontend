@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { crearCliente } from '../../pages/Cliente';
 import './AgregarCliente.css';
 
 export default function AgregarCliente() {
@@ -13,7 +14,7 @@ export default function AgregarCliente() {
     const navigate = useNavigate();
 
     // Maneja el envío del formulario para agregar un cliente
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -24,19 +25,7 @@ export default function AgregarCliente() {
             return;
         }
         try {
-            // Obtiene los clientes actuales y agrega el nuevo
-            const guardados = localStorage.getItem('clientes');
-            const clientes = guardados ? JSON.parse(guardados) : [];
-            const nuevoCliente = {
-                id: Date.now(),
-                nombre,
-                razonSocial,
-                correo,
-                cuit: Number(cuit)
-            };
-            clientes.push(nuevoCliente);
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            // Redirige a la lista de clientes
+            await crearCliente(nombre, razonSocial, correo, cuit);
             navigate('/clientes');
         } catch (error) {
             setError('Error al guardar el cliente');
@@ -47,7 +36,6 @@ export default function AgregarCliente() {
 
     return (
         <form onSubmit={handleSubmit} className="formulario">
-            {/* Muestra errores de validación o guardado */}
             {error && (
                 <div className="alert alert-danger" role="alert">
                     {error}

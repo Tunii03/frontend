@@ -4,6 +4,10 @@ import { FaPlus, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './ListaPedidos.css';
 import AgregarPedido from './AgregarPedido.jsx';
+import { obtenerPedidos, eliminarPedido } from '../../pages/Pedido';
+import { buscarProductos } from '../../pages/Producto';
+import { buscarClientes } from '../../pages/Cliente';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function Pedidos() {
     const navigate = useNavigate();
@@ -19,21 +23,22 @@ export default function Pedidos() {
     const [error, setError] = useState(null);
     // Estado para loading
     const [loading, setLoading] = useState(false);
-
+    const { titulo, setTitulo } = useTitulo();
     // Carga pedidos, productos y clientes al montar el componente
     useEffect(() => {
+        setTitulo('Pedidos');
         cargarPedidos();
         cargarProductos();
         cargarClientes();
     }, []);
 
-    // Obtiene los pedidos desde localStorage
-    const cargarPedidos = () => {
+    // Obtiene los pedidos desde la API
+    const cargarPedidos = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('pedidos');
-            setPedidos(guardados ? JSON.parse(guardados) : []);
+            const data = await obtenerPedidos();
+            setPedidos(data);
         } catch (error) {
             setError('Error al cargar los pedidos');
         } finally {
@@ -41,27 +46,21 @@ export default function Pedidos() {
         }
     };
 
-    // Obtiene los productos desde localStorage
-    const cargarProductos = () => {
+    // Obtiene los productos desde la API
+    const cargarProductos = async () => {
         try {
-            const productosGuardados = localStorage.getItem('productos');
-            if (productosGuardados) {
-                setProductos(JSON.parse(productosGuardados));
-            }
+            const response = await buscarProductos();
+            setProductos(response.data);
         } catch (error) {
             setError('Error al cargar los productos');
         }
     };
 
-    // Obtiene los clientes desde localStorage
-    const cargarClientes = () => {
+    // Obtiene los clientes desde la API
+    const cargarClientes = async () => {
         try {
-            const clientesGuardados = localStorage.getItem('clientes');
-            if (clientesGuardados) {
-                setClientes(JSON.parse(clientesGuardados));
-            } else {
-                setClientes([]);
-            }
+            const response = await buscarClientes();
+            setClientes(response.data);
         } catch (error) {
             setError('Error al cargar los clientes');
         }
@@ -77,15 +76,12 @@ export default function Pedidos() {
         navigate(`/pedidos/editar/${id}`);
     };
 
-    // Elimina un pedido por id, con confirmación
-    const eliminarPedido = (id) => {
+    // Elimina un pedido por id, con confirmación y usando la API
+    const handleEliminarPedido = async (id) => {
         if (window.confirm('¿Seguro que deseas eliminar este pedido?')) {
             try {
-                const guardados = localStorage.getItem('pedidos');
-                const pedidosArray = guardados ? JSON.parse(guardados) : [];
-                const nuevos = pedidosArray.filter(p => p.id !== id);
-                localStorage.setItem('pedidos', JSON.stringify(nuevos));
-                setPedidos(nuevos);
+                await eliminarPedido(id);
+                setPedidos(prev => prev.filter(p => p.id !== id));
             } catch (error) {
                 setError('Error al eliminar el pedido');
             }
@@ -95,7 +91,7 @@ export default function Pedidos() {
     return (
         <div className="pedidos-container">
             <div className="header-pedidos">
-                <h1>Pedidos</h1>
+                <h1>{titulo}</h1>
                 <Button variant="primary" onClick={() => setMostrarModal(true)}>
                     <FaPlus /> Nuevo Pedido
                 </Button>
@@ -132,7 +128,7 @@ export default function Pedidos() {
                                 <tr key={pedido.id}>
                                     <td>{pedido.id}</td>
                                     <td>{pedido.cliente}</td>
-                                    <td>{new Date(pedido.fecha).toLocaleDateString()}</td>
+                                    <td>{pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : ''}</td>
                                     <td>${pedido.montoTotal}</td>
                                     <td>
                                         <Button 
@@ -154,7 +150,7 @@ export default function Pedidos() {
                                         <Button
                                             variant="danger"
                                             size="sm"
-                                            onClick={() => eliminarPedido(pedido.id)}
+                                            onClick={() => handleEliminarPedido(pedido.id)}
                                         >
                                             <FaTrash />
                                         </Button>

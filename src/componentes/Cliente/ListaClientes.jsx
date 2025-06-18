@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ListaClientes.css';
 import { FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { buscarClientes, borrarCliente } from '../../pages/Cliente';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaClientes() {
     // Estado para la lista de clientes
@@ -11,19 +13,21 @@ export default function ListaClientes() {
     // Estado para errores
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { titulo, setTitulo } = useTitulo();
 
     // Cargar clientes al montar el componente
     useEffect(() => {
+        setTitulo('Clientes');
         cargarClientes();
     }, []);
 
-    // Obtiene los clientes desde localStorage
-    const cargarClientes = () => {
+    // Obtiene los clientes desde la API
+    const cargarClientes = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('clientes');
-            setClientes(guardados ? JSON.parse(guardados) : []);
+            const response = await buscarClientes();
+            setClientes(response.data);
         } catch (error) {
             setError('Error al cargar los clientes');
         } finally {
@@ -31,15 +35,12 @@ export default function ListaClientes() {
         }
     };
 
-    // Elimina un cliente por id, con confirmación
-    const eliminarCliente = (id) => {
+    // Elimina un cliente por id, con confirmación y usando la API
+    const eliminarCliente = async (id) => {
         if (!window.confirm('¿Seguro que deseas eliminar este cliente?')) return;
         try {
-            const guardados = localStorage.getItem('clientes');
-            const clientesArray = guardados ? JSON.parse(guardados) : [];
-            const nuevos = clientesArray.filter(c => c.id !== id);
-            localStorage.setItem('clientes', JSON.stringify(nuevos));
-            setClientes(nuevos);
+            await borrarCliente({ id });
+            setClientes(clientes.filter(c => c.id !== id));
         } catch (error) {
             setError('Error al eliminar el cliente');
         }
@@ -55,7 +56,7 @@ export default function ListaClientes() {
     return (
         <div className="clientes-container">
             <div className="header-clientes">
-                <h1>Clientes</h1>
+                <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarCliente}>
                     <FaPlus /> Agregar Cliente
                 </button>

@@ -3,8 +3,6 @@ import axios from 'axios'
 
     export function crearPresupuesto({idpedido,estado}){
         const datos = {
-            monto:monto,
-            clienteId: idcliente,
             estado:estado,
             pedidoId:idpedido
         }
@@ -40,7 +38,7 @@ import axios from 'axios'
         const datos ={
             monto:monto
         }
-        axios.put(`http://localhost:8080/api/producto/${id}`,datos)
+        axios.put(`http://localhost:8080/api/presupuesto/${id}`,datos)
         .then(function(response){
             console.log(response)
         })

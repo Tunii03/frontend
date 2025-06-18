@@ -5,38 +5,49 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaPlus, FaSearch, FaTrash } from 'react-icons/fa';
 import './ListaProductos.css';
+import { buscarProductos, borrarProducto } from '../../pages/Producto';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaProductos() {
     // Estado para la lista de productos
-    const [productos, setProductos] = useState(() => {
-        const guardados = localStorage.getItem('productos');
-        if (guardados) {
-            const arr = JSON.parse(guardados);
-            if (Array.isArray(arr) && arr.length > 0) return arr;
-        }
-        return [];
-    });
+    const [productos, setProductos] = useState([]);
     // Estado para mostrar el modal de agregar producto
     const [mostrarModal, setMostrarModal] = useState(false);
     // Estado para la búsqueda
     const [busqueda, setBusqueda] = useState('');
     const navigate = useNavigate();
+    const { titulo, setTitulo } = useTitulo();
 
-    // Actualiza localStorage cuando cambia la lista de productos
+    // Carga los productos desde la API al montar
     useEffect(() => {
-        localStorage.setItem('productos', JSON.stringify(productos));
-    }, [productos]);
+        setTitulo('Productos');
+        cargarProductos();
+    }, [setTitulo]);
 
-    // Agrega un nuevo producto a la lista
-    const agregarProducto = (nuevo) => {
-        setProductos([...productos, { ...nuevo, id: Date.now() }]);
-        setMostrarModal(false);
+    const cargarProductos = async () => {
+        try {
+            const response = await buscarProductos();
+            setProductos(response.data);
+        } catch (error) {
+            setProductos([]);
+        }
     };
 
-    // Elimina un producto por id
-    const eliminarProducto = (e, id) => {
+    // Agrega un nuevo producto a la lista (recarga desde la API)
+    const agregarProducto = () => {
+        setMostrarModal(false);
+        cargarProductos();
+    };
+
+    // Elimina un producto por id usando la API
+    const eliminarProducto = async (e, id) => {
         e.stopPropagation();
-        setProductos(productos.filter(p => p.id !== id));
+        try {
+            await borrarProducto({ id });
+            setProductos(productos.filter(p => p.id !== id));
+        } catch (error) {
+            // Manejo de error opcional
+        }
     };
 
     // Navega al detalle del producto
@@ -53,7 +64,7 @@ export default function ListaProductos() {
         <div className="lista-productos">
             <div className="header-productos">
                 <div className="titulo-productos">
-                    <h1>Catálogo de Productos</h1>
+                    <h1>{titulo}</h1>
                     <Button className="btn-mas" variant="outline-dark" onClick={() => setMostrarModal(true)} title="Agregar producto">
                         <FaPlus size={24} />
                     </Button>

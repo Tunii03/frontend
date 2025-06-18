@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { crearPresupuesto } from '../../pages/Presupuesto';
+import { obtenerPedidos } from '../../pages/Pedido';
 import './AgregarPresupuesto.css';
 
 export default function AgregarPresupuesto() {
@@ -17,12 +19,20 @@ export default function AgregarPresupuesto() {
 
     // Carga los pedidos al montar el componente
     useEffect(() => {
-        const pedidosGuardados = localStorage.getItem('pedidos');
-        setPedidos(pedidosGuardados ? JSON.parse(pedidosGuardados) : []);
+        const cargarPedidos = async () => {
+            try {
+                const response = await obtenerPedidos();
+                setPedidos(response.data);
+            } catch (error) {
+                setError('Error al cargar los pedidos');
+                console.error('Error:', error);
+            }
+        };
+        cargarPedidos();
     }, []);
 
     // Maneja el envío del formulario para agregar un presupuesto
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -33,20 +43,14 @@ export default function AgregarPresupuesto() {
             return;
         }
         try {
-            // Obtiene los presupuestos actuales y agrega el nuevo
-            const presupuestosGuardados = localStorage.getItem('presupuestos');
-            const presupuestos = presupuestosGuardados ? JSON.parse(presupuestosGuardados) : [];
-            const nuevoPresupuesto = {
-                id: Date.now(),
-                idPedido,
-                createdDate: new Date().toISOString(),
-                estado
-            };
-            presupuestos.push(nuevoPresupuesto);
-            localStorage.setItem('presupuestos', JSON.stringify(presupuestos));
+            await crearPresupuesto({
+                idpedido: idPedido,
+                estado: estado
+            });
             navigate('/presupuestos');
         } catch (error) {
             setError('Error al guardar el presupuesto');
+            console.error('Error:', error);
         } finally {
             setLoading(false);
         }

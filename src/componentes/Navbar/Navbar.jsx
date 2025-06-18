@@ -10,7 +10,7 @@ export default function NavbarComponent() {
         <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
             <Container>
                 <Navbar.Brand as={Link} to="/" className="brand">
-                    Sistema de Gestión
+                    Tunitos ERP
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { crearPago } from '../../pages/Pago';
+import { buscarPresupuestos } from '../../pages/Presupuesto';
 import './AgregarPago.css';
 
 export default function AgregarPago() {
@@ -15,12 +17,19 @@ export default function AgregarPago() {
 
     // Carga los presupuestos al montar el componente
     useEffect(() => {
-        const presupuestosGuardados = localStorage.getItem('presupuestos');
-        setPresupuestos(presupuestosGuardados ? JSON.parse(presupuestosGuardados) : []);
+        const cargarPresupuestos = async () => {
+            try {
+                const response = await buscarPresupuestos();
+                setPresupuestos(response.data);
+            } catch (error) {
+                setError('Error al cargar los presupuestos');
+            }
+        };
+        cargarPresupuestos();
     }, []);
 
     // Maneja el envío del formulario para agregar un pago
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -31,16 +40,7 @@ export default function AgregarPago() {
             return;
         }
         try {
-            // Obtiene los pagos actuales y agrega el nuevo
-            const pagosGuardados = localStorage.getItem('pagos');
-            const pagos = pagosGuardados ? JSON.parse(pagosGuardados) : [];
-            const nuevoPago = {
-                id: Date.now(),
-                idPresupuesto,
-                createdDate: new Date().toISOString()
-            };
-            pagos.push(nuevoPago);
-            localStorage.setItem('pagos', JSON.stringify(pagos));
+            await crearPago({ idPresupuesto });
             navigate('/pago');
         } catch (error) {
             setError('Error al guardar el pago');
@@ -52,7 +52,6 @@ export default function AgregarPago() {
     return (
         <form onSubmit={handleSubmit} className="formulario-pago">
             <h2>Nuevo Pago</h2>
-            {/* Muestra errores de validación o guardado */}
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="form-group">
                 <label>Presupuesto:</label>
@@ -64,7 +63,7 @@ export default function AgregarPago() {
                     <option value="">Seleccione un presupuesto</option>
                     {presupuestos.map(p => (
                         <option key={p.id} value={p.id}>
-                            #{p.id} - Pedido #{p.idPedido} - {new Date(p.createdDate).toLocaleDateString()}
+                            #{p.id} - Pedido #{p.pedidoId || p.idPedido} - {p.createdDate ? new Date(p.createdDate).toLocaleDateString() : ''}
                         </option>
                     ))}
                 </select>

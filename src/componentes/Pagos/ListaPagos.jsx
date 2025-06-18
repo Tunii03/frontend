@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
 import './ListaPagos.css';
+import { buscarPagos } from '../../pages/Pago';
+import { buscarPresupuestos } from '../../pages/Presupuesto';
+import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaPagos() {
     // Estado para la lista de pagos
@@ -13,20 +16,21 @@ export default function ListaPagos() {
     // Estado para errores
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
+    const { titulo, setTitulo } = useTitulo();
     // Carga los pagos y presupuestos al montar el componente
     useEffect(() => {
+        setTitulo('Pagos');
         cargarPagos();
         cargarPresupuestos();
     }, []);
 
-    // Obtiene los pagos desde localStorage
-    const cargarPagos = () => {
+    // Obtiene los pagos desde la API
+    const cargarPagos = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('pagos');
-            setPagos(guardados ? JSON.parse(guardados) : []);
+            const response = await buscarPagos();
+            setPagos(response.data);
         } catch (error) {
             setError('Error al cargar los pagos');
         } finally {
@@ -34,11 +38,11 @@ export default function ListaPagos() {
         }
     };
 
-    // Obtiene los presupuestos desde localStorage
-    const cargarPresupuestos = () => {
+    // Obtiene los presupuestos desde la API
+    const cargarPresupuestos = async () => {
         try {
-            const guardados = localStorage.getItem('presupuestos');
-            setPresupuestos(guardados ? JSON.parse(guardados) : []);
+            const response = await buscarPresupuestos();
+            setPresupuestos(response.data);
         } catch (error) {
             setPresupuestos([]);
         }
@@ -57,7 +61,7 @@ export default function ListaPagos() {
     return (
         <div className="pagos-container">
             <div className="header-pagos">
-                <h1>Pagos</h1>
+                <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarPago}>
                     <FaPlus /> Nuevo Pago
                 </button>
@@ -84,7 +88,7 @@ export default function ListaPagos() {
                                     <tr key={p.id}>
                                         <td>{p.id}</td>
                                         <td>{presupuesto ? `#${presupuesto.id}` : p.idPresupuesto}</td>
-                                        <td>{new Date(p.createdDate).toLocaleDateString()}</td>
+                                        <td>{p.createdDate ? new Date(p.createdDate).toLocaleDateString() : ''}</td>
                                     </tr>
                                 );
                             })

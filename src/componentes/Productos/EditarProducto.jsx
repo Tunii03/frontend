@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './ListaProductos.css';
+import { mostrarProducto, actualizarProducto } from '../../pages/Producto';
 
 export default function EditarProducto() {
     const { id } = useParams();
@@ -16,17 +17,15 @@ export default function EditarProducto() {
     // Carga el producto al montar o cambiar el id
     useEffect(() => {
         cargarProducto();
-        // eslint-disable-next-line
     }, [id]);
 
-    // Busca el producto por id en localStorage y setea los campos
-    const cargarProducto = () => {
+   
+    const cargarProducto = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('productos');
-            const productos = guardados ? JSON.parse(guardados) : [];
-            const producto = productos.find(p => String(p.id) === String(id));
+            const response = await mostrarProducto({ id });
+            const producto = response.data;
             if (producto) {
                 setNombre(producto.nombre);
                 setStock(producto.stock);
@@ -43,7 +42,7 @@ export default function EditarProducto() {
     };
 
     // Maneja el envío del formulario para editar el producto
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         // Validación simple de campos obligatorios
@@ -52,15 +51,13 @@ export default function EditarProducto() {
             return;
         }
         try {
-            // Actualiza el producto en localStorage
-            const guardados = localStorage.getItem('productos');
-            let productos = guardados ? JSON.parse(guardados) : [];
-            productos = productos.map(p =>
-                String(p.id) === String(id)
-                    ? { ...p, nombre, stock: Number(stock), descripcion, precio: Number(precio) }
-                    : p
-            );
-            localStorage.setItem('productos', JSON.stringify(productos));
+            await actualizarProducto({
+                id,
+                nombre,
+                stock: Number(stock),
+                descripcion,
+                precio: Number(precio)
+            });
             navigate('/productos');
         } catch (error) {
             setError('Error al guardar los cambios');

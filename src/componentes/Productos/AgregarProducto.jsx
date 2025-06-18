@@ -46,6 +46,11 @@ export default function AgregarProducto({ onProductoAgregado }) {
             descripcion,
             imagen: imagenPreview
         });
+        if (imagenPreview) {
+            const clave = `imagen_producto_${Date.now()}`;
+            localStorage.setItem(clave, imagenPreview);
+        }
+        
         try{
             await crearProducto(nombre,stock,descripcion,precio);
         }

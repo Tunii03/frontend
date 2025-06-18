@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Modal, Table, Alert } from 'react-bootstrap';
 import './ListaPedidos.css';
+import { obtenerPedido, actualizarPedido } from '../../pages/Pedido';
+import { buscarClientes } from '../../pages/Cliente';
+import { buscarProductos } from '../../pages/Producto';
 
 export default function EditarPedido() {
     const { id } = useParams();
     const navigate = useNavigate();
-    // Estados para los datos del pedido y formularios
     const [clientes, setClientes] = useState([]);
     const [productos, setProductos] = useState([]);
     const [pedido, setPedido] = useState(null);
@@ -18,36 +20,24 @@ export default function EditarPedido() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Carga los datos del pedido, clientes y productos al montar o cambiar el id
     useEffect(() => {
         cargarDatos();
-        // eslint-disable-next-line
     }, [id]);
 
-    // Busca el pedido, clientes y productos en localStorage y setea los campos
-    const cargarDatos = () => {
+    const cargarDatos = async () => {
         setLoading(true);
         setError(null);
         try {
-            // Cargar clientes
-            const clientesGuardados = localStorage.getItem('clientes');
-            setClientes(clientesGuardados ? JSON.parse(clientesGuardados) : []);
-            // Cargar productos
-            const productosGuardados = localStorage.getItem('productos');
-            setProductos(productosGuardados ? JSON.parse(productosGuardados) : []);
-            // Cargar pedido
-            const pedidosGuardados = localStorage.getItem('pedidos');
-            const pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
-            const pedidoEncontrado = pedidos.find(p => String(p.id) === String(id));
+            const clientesResp = await buscarClientes();
+            setClientes(clientesResp.data);
+            const productosResp = await buscarProductos();
+            setProductos(productosResp.data);
+            const pedidoEncontrado = await obtenerPedido(id);
             if (pedidoEncontrado) {
                 setPedido(pedidoEncontrado);
-                setClienteId(
-                    clientesGuardados
-                        ? (JSON.parse(clientesGuardados).find(c => c.nombre === pedidoEncontrado.cliente)?.id || '')
-                        : ''
-                );
-                setProductosPedido(pedidoEncontrado.productos);
-                setMontoTotal(pedidoEncontrado.montoTotal);
+                setClienteId(pedidoEncontrado.clienteId || '');
+                setProductosPedido(pedidoEncontrado.productos || []);
+                setMontoTotal(pedidoEncontrado.montoTotal || 0);
             } else {
                 setError('No se encontró el pedido');
             }
@@ -58,7 +48,6 @@ export default function EditarPedido() {
         }
     };
 
-    // Agrega un producto al pedido
     const agregarProductoAlPedido = () => {
         const producto = productos.find(p => p.id === Number(productoSeleccionado));
         if (producto) {
@@ -74,14 +63,12 @@ export default function EditarPedido() {
         }
     };
 
-    // Elimina un producto del pedido
     const eliminarProductoDelPedido = (index) => {
         const productoAEliminar = productosPedido[index];
         setProductosPedido(prev => prev.filter((_, i) => i !== index));
         setMontoTotal(prev => prev - productoAEliminar.subtotal);
     };
 
-    // Cambia la cantidad de un producto en el pedido
     const cambiarCantidadProducto = (index, nuevaCantidad) => {
         setProductosPedido(prev => prev.map((p, i) => {
             if (i === index) {
@@ -90,14 +77,12 @@ export default function EditarPedido() {
             }
             return p;
         }));
-        // Recalcular el total
         setTimeout(() => {
             setMontoTotal(productosPedido.reduce((acc, p, i) => i === index ? acc + p.precio * nuevaCantidad : acc + p.subtotal, 0));
         }, 0);
     };
 
-    // Guarda los cambios del pedido editado
-    const handleGuardar = (e) => {
+    const handleGuardar = async (e) => {
         e.preventDefault();
         setError(null);
         if (!clienteId || productosPedido.length === 0) {
@@ -105,21 +90,10 @@ export default function EditarPedido() {
             return;
         }
         try {
-            const pedidosGuardados = localStorage.getItem('pedidos');
-            let pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
-            const clienteSeleccionado = clientes.find(c => String(c.id) === String(clienteId));
-            pedidos = pedidos.map(p =>
-                String(p.id) === String(id)
-                    ? {
-                        ...p,
-                        cliente: clienteSeleccionado ? clienteSeleccionado.nombre : '',
-                        clienteId: clienteId,
-                        productos: productosPedido,
-                        montoTotal: productosPedido.reduce((acc, p) => acc + p.subtotal, 0)
-                    }
-                    : p
-            );
-            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            await actualizarPedido({
+                id,
+                monto: productosPedido.reduce((acc, p) => acc + p.subtotal, 0)
+            });
             navigate('/pedidos');
         } catch (error) {
             setError('Error al guardar los cambios');
@@ -127,11 +101,9 @@ export default function EditarPedido() {
     };
 
     if (loading) {
-        // Muestra un mensaje de carga
         return <div className="formulario"><span>Cargando...</span></div>;
     }
     if (error) {
-        // Muestra errores y un mensaje
         return <div className="formulario"><div className="alert alert-danger">{error}</div></div>;
     }
 
@@ -204,17 +176,23 @@ export default function EditarPedido() {
                                 <td>${p.subtotal}</td>
                                 <td>
                                     <Button variant="danger" size="sm" onClick={() => eliminarProductoDelPedido(index)}>
-                                        Eliminar
+                                        Quitar
                                     </Button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
-                <h5>Total: ${productosPedido.reduce((acc, p) => acc + p.subtotal, 0)}</h5>
+                <div className="total-pedido">
+                    <strong>Total: ${productosPedido.reduce((acc, p) => acc + p.subtotal, 0)}</strong>
+                </div>
             </div>
-            <button type="submit" className="btn-submit">Guardar Cambios</button>
-            <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/pedidos')}>Cancelar</button>
+            <Button type="submit" variant="primary" className="mt-3">
+                Guardar Cambios
+            </Button>
+            <Button type="button" variant="secondary" className="mt-3 ms-2" onClick={() => navigate('/pedidos')}>
+                Cancelar
+            </Button>
         </form>
     );
 } 

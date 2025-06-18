@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './EditarCliente.css';
+import { mostrarClientes, actualizarCliente } from '../../pages/Cliente';
 
 export default function EditarCliente() {
     const { id } = useParams();
@@ -16,17 +17,14 @@ export default function EditarCliente() {
     // Carga los datos del cliente al montar o cambiar el id
     useEffect(() => {
         cargarCliente();
-        // eslint-disable-next-line
     }, [id]);
 
-    // Busca el cliente por id en localStorage y setea los campos
-    const cargarCliente = () => {
+    const cargarCliente = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('clientes');
-            const clientes = guardados ? JSON.parse(guardados) : [];
-            const cliente = clientes.find(c => String(c.id) === String(id));
+            const response = await mostrarClientes({ id });
+            const cliente = response.data;
             if (cliente) {
                 setNombre(cliente.nombre);
                 setRazonSocial(cliente.razonSocial);
@@ -43,7 +41,7 @@ export default function EditarCliente() {
     };
 
     // Maneja el envío del formulario para editar el cliente
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         // Validación simple de campos obligatorios
@@ -52,15 +50,13 @@ export default function EditarCliente() {
             return;
         }
         try {
-            // Actualiza el cliente en localStorage
-            const guardados = localStorage.getItem('clientes');
-            let clientes = guardados ? JSON.parse(guardados) : [];
-            clientes = clientes.map(c =>
-                String(c.id) === String(id)
-                    ? { ...c, nombre, razonSocial, correo, cuit: Number(cuit) }
-                    : c
-            );
-            localStorage.setItem('clientes', JSON.stringify(clientes));
+            await actualizarCliente({
+                id,
+                nombre,
+                razonSocial,
+                correo,
+                cuit: Number(cuit)
+            });
             navigate('/clientes');
         } catch (error) {
             setError('Error al guardar los cambios');

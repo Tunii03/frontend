@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './DetalleCliente.css';
+import { mostrarClientes } from '../../pages/Cliente';
 
 export default function DetalleCliente() {
     const { id } = useParams();
@@ -15,17 +16,14 @@ export default function DetalleCliente() {
     // Carga el cliente al montar o cambiar el id
     useEffect(() => {
         cargarCliente();
-        // eslint-disable-next-line
     }, [id]);
 
-    // Busca el cliente por id en localStorage
-    const cargarCliente = () => {
+    const cargarCliente = async () => {
         setLoading(true);
         setError(null);
         try {
-            const guardados = localStorage.getItem('clientes');
-            const clientes = guardados ? JSON.parse(guardados) : [];
-            const encontrado = clientes.find(c => String(c.id) === String(id));
+            const response = await mostrarClientes({ id });
+            const encontrado = response.data;
             if (encontrado) {
                 setCliente(encontrado);
             } else {

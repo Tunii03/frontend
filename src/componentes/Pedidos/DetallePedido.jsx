@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Table, Alert, Spinner } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import './DetallePedido.css';
+import { obtenerPedido } from '../../pages/Pedido';
 
 export default function DetallePedido() {
     const { id } = useParams();
@@ -17,17 +18,14 @@ export default function DetallePedido() {
     // Carga el pedido al montar o cambiar el id
     useEffect(() => {
         cargarPedido();
-        // eslint-disable-next-line
     }, [id]);
 
-    // Busca el pedido por id en localStorage
-    const cargarPedido = () => {
+    // Busca el pedido por id en la API
+    const cargarPedido = async () => {
         setLoading(true);
         setError(null);
         try {
-            const pedidosGuardados = localStorage.getItem('pedidos');
-            const pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
-            const pedidoEncontrado = pedidos.find(p => String(p.id) === String(id));
+            const pedidoEncontrado = await obtenerPedido(id);
             if (pedidoEncontrado) {
                 setPedido(pedidoEncontrado);
             } else {
@@ -87,7 +85,7 @@ export default function DetallePedido() {
                     <div className="info-cliente">
                         <h3>Información del Cliente</h3>
                         <p><strong>Cliente:</strong> {pedido.cliente}</p>
-                        <p><strong>Fecha:</strong> {new Date(pedido.fecha).toLocaleDateString()}</p>
+                        <p><strong>Fecha:</strong> {pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : ''}</p>
                     </div>
 
                     <div className="productos-pedido">
@@ -102,7 +100,7 @@ export default function DetallePedido() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {pedido.productos.map((producto, index) => (
+                                {pedido.productos && pedido.productos.map((producto, index) => (
                                     <tr key={index}>
                                         <td>{producto.nombre}</td>
                                         <td>{producto.cantidad}</td>

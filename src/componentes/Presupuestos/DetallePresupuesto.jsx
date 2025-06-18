@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { mostrarPresupuesto } from '../../pages/Presupuesto';
+import { obtenerPedido } from '../../pages/Pedido';
 import './DetallePresupuesto.css';
 
 export default function DetallePresupuesto() {
@@ -20,21 +22,17 @@ export default function DetallePresupuesto() {
     }, [id]);
 
     // Busca el presupuesto y su pedido relacionado en localStorage
-    const cargarDatos = () => {
+    const cargarDatos = async () => {
         setLoading(true);
         setError(null);
         try {
-            const presupuestosGuardados = localStorage.getItem('presupuestos');
-            const pedidosGuardados = localStorage.getItem('pedidos');
-            const presupuestos = presupuestosGuardados ? JSON.parse(presupuestosGuardados) : [];
-            const pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
-            const encontrado = presupuestos.find(p => String(p.id) === String(id));
-            if (encontrado) {
-                setPresupuesto(encontrado);
-                const pedidoRelacionado = pedidos.find(ped => String(ped.id) === String(encontrado.idPedido));
-                setPedido(pedidoRelacionado || null);
+            const presupuestoData = await mostrarPresupuesto({ id });
+            setPresupuesto(presupuestoData);
+            if (presupuestoData.pedidoId) {
+                const pedidoData = await obtenerPedido(presupuestoData.pedidoId);
+                setPedido(pedidoData);
             } else {
-                setError('No se encontró el presupuesto');
+                setPedido(null);
             }
         } catch (error) {
             setError('Error al cargar el presupuesto');
@@ -60,8 +58,8 @@ export default function DetallePresupuesto() {
                 <button className="btn-volver" onClick={() => navigate('/presupuestos')}>Volver a Presupuestos</button>
             </div>
             <div className="info-presupuesto">
-                <p><strong>Pedido Asociado:</strong> #{presupuesto.idPedido}</p>
-                <p><strong>Fecha:</strong> {new Date(presupuesto.createdDate).toLocaleDateString()}</p>
+                <p><strong>Pedido Asociado:</strong> #{presupuesto.pedidoId || presupuesto.idPedido}</p>
+                <p><strong>Fecha:</strong> {presupuesto.createdDate ? new Date(presupuesto.createdDate).toLocaleDateString() : ''}</p>
                 <p><strong>Estado:</strong> {presupuesto.estado ? 'Pagado' : 'Pendiente'}</p>
             </div>
             {pedido && (
@@ -70,7 +68,7 @@ export default function DetallePresupuesto() {
                     <p><strong>Cliente:</strong> {pedido.cliente}</p>
                     <p><strong>Monto Total:</strong> ${pedido.montoTotal}</p>
                     <ul>
-                        {pedido.productos.map((prod, idx) => (
+                        {pedido.productos && pedido.productos.map((prod, idx) => (
                             <li key={idx}>{prod.nombre} x{prod.cantidad} - ${prod.subtotal}</li>
                         ))}
                     </ul>

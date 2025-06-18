@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Spinner, Alert } from 'react-bootstrap';
 import './AgregarPedido.css';
+import { crearPedido, agregarProducto } from '../../pages/Pedido';
 
 export default function AgregarPedido({
   show, onHide, onPedidoAgregado, productosGlobal, clientesGlobal
@@ -62,47 +63,27 @@ export default function AgregarPedido({
     }));
   };
 
-  // Guarda el pedido, valida stock y descuenta del localStorage
-  const guardarPedido = () => {
+  const guardarPedido = async () => {
     setLoading(true);
     setError(null);
     try {
       if (nuevoPedido.clienteId && nuevoPedido.productos.length > 0) {
-        // Validar stock antes de guardar
-        const productosGuardados = JSON.parse(localStorage.getItem('productos') || '[]');
-        const productosActualizados = [...productosGuardados];
-        for (const prodPedido of nuevoPedido.productos) {
-          const prodIndex = productosActualizados.findIndex(p => p.id === prodPedido.id);
-          if (prodIndex === -1) {
-            setError(`El producto "${prodPedido.nombre}" no existe.`);
-            setLoading(false);
-            return;
-          }
-          if (productosActualizados[prodIndex].stock < prodPedido.cantidad) {
-            setError(`No hay suficiente stock para "${prodPedido.nombre}". Stock disponible: ${productosActualizados[prodIndex].stock}`);
-            setLoading(false);
-            return;
-          }
+        // 1. Crear el pedido y obtener el id
+        const pedidoCreado = await crearPedido({
+          idcliente: nuevoPedido.clienteId,
+          monto: nuevoPedido.montoTotal
+        });
+        const idPedido = pedidoCreado.id;
+        // 2. Agregar cada producto al pedido usando la API
+        for (const p of nuevoPedido.productos) {
+          await agregarProducto({
+            idPedido,
+            idProducto: p.id,
+            cantidad: p.cantidad,
+            monto: p.subtotal
+          });
         }
-        // Descontar stock
-        for (const prodPedido of nuevoPedido.productos) {
-          const prodIndex = productosActualizados.findIndex(p => p.id === prodPedido.id);
-          productosActualizados[prodIndex].stock -= prodPedido.cantidad;
-        }
-        localStorage.setItem('productos', JSON.stringify(productosActualizados));
-        // Guardar pedido
-        const pedidosActuales = localStorage.getItem('pedidos');
-        const pedidosArray = pedidosActuales ? JSON.parse(pedidosActuales) : [];
-        const clienteSeleccionado = clientes.find(c => String(c.id) === String(nuevoPedido.clienteId));
-        const nuevo = {
-          ...nuevoPedido,
-          cliente: clienteSeleccionado ? clienteSeleccionado.nombre : '',
-          id: Date.now(),
-          fecha: new Date().toISOString()
-        };
-        pedidosArray.push(nuevo);
-        localStorage.setItem('pedidos', JSON.stringify(pedidosArray));
-        if (onPedidoAgregado) onPedidoAgregado(nuevo);
+        if (onPedidoAgregado) onPedidoAgregado();
         setNuevoPedido({ clienteId: '', productos: [], montoTotal: 0 });
         onHide();
       } else {
@@ -198,22 +179,9 @@ export default function AgregarPedido({
         <Button
           variant="primary"
           onClick={guardarPedido}
-          disabled={loading || !nuevoPedido.clienteId || nuevoPedido.productos.length === 0}
+          disabled={loading}
         >
-          {loading ? (
-            <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-              {' '}Guardando...
-            </>
-          ) : (
-            'Guardar Pedido'
-          )}
+          {loading ? <Spinner animation="border" size="sm" /> : 'Guardar Pedido'}
         </Button>
       </Modal.Footer>
     </Modal>
