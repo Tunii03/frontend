@@ -50,16 +50,21 @@ export default function EditarProducto() {
             setError('Todos los campos son obligatorios');
             return;
         }
+        
+        console.log('Intentando actualizar producto:', { id, nombre, stock, descripcion, precio });
+        
         try {
-            await actualizarProducto({
+            const response = await actualizarProducto({
                 id,
                 nombre,
                 stock: Number(stock),
                 descripcion,
                 precio: Number(precio)
             });
+            console.log('Producto actualizado exitosamente:', response);
             navigate('/productos');
         } catch (error) {
+            console.error('Error al actualizar producto:', error);
             setError('Error al guardar los cambios');
         }
     };
