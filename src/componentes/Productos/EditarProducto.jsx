@@ -51,6 +51,13 @@ export default function EditarProducto() {
             return;
         }
         try {
+            console.log('📝 Datos a actualizar:', {
+                id,
+                nombre,
+                stock: Number(stock),
+                descripcion,
+                precio: Number(precio)
+            });
             await actualizarProducto({
                 id,
                 nombre,

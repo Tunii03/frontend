@@ -5,12 +5,15 @@ export function crearPedido({monto, idcliente}) {
         monto: monto,
         clienteId: idcliente
     };
-    return axios.post('http://localhost:8080/api/pedido', {datos})
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error al crear pedido:', error);
-            throw error;
-        });
+    return axios.post('http://localhost:8080/api/pedido', datos)
+    .then(function(response){
+        console.log(response)
+        return response
+    })
+    .catch(function(error){
+        console.log(error)
+        throw error
+    })
 }
 
 export function agregarProducto({idPedido, idProducto, cantidad, monto}) {
@@ -19,7 +22,7 @@ export function agregarProducto({idPedido, idProducto, cantidad, monto}) {
         cantidad: cantidad,
         monto: monto
     };
-    return axios.post(`http://localhost:8080/api/pedido/${idPedido}/producto`, {datos})
+    return axios.post(`http://localhost:8080/api/pedido/${idPedido}/producto`, datos)
         .then(response => response.data)
         .catch(error => {
             console.error('Error al agregar producto:', error);
@@ -49,7 +52,7 @@ export function actualizarPedido({id, monto}) {
     const datos = {
         monto: monto
     };
-    return axios.put(`http://localhost:8080/api/pedido/${id}`, {datos})
+    return axios.put(`http://localhost:8080/api/pedido/${id}`, datos)
         .then(response => response.data)
         .catch(error => {
             console.error('Error al actualizar pedido:', error);

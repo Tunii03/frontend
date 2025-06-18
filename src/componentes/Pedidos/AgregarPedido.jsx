@@ -10,7 +10,7 @@ export default function AgregarPedido({
   const [nuevoPedido, setNuevoPedido] = useState({
     clienteId: '',
     productos: [],
-    montoTotal: 0
+    montoTotal: 1.0
   });
   // Estado para la lista de productos y clientes
   const [productos, setProductos] = useState([]);
@@ -69,18 +69,24 @@ export default function AgregarPedido({
     try {
       if (nuevoPedido.clienteId && nuevoPedido.productos.length > 0) {
         // 1. Crear el pedido y obtener el id
-        const pedidoCreado = await crearPedido({
-          idcliente: nuevoPedido.clienteId,
-          monto: nuevoPedido.montoTotal
+         console.log('📦 Objeto de pedido a enviar al backend:', {
+            idcliente: nuevoPedido.clienteId,
+            monto: nuevoPedido.montoTotal // <-- Aquí ves el valor de monto/montoTotal
         });
-        const idPedido = pedidoCreado.id;
+        const pedidoCreado = await crearPedido({
+          monto: nuevoPedido.montoTotal,
+          idcliente: nuevoPedido.clienteId
+        });
+        
+        const idPedido = pedidoCreado.data.id;
+        console.log({idPedido})
         // 2. Agregar cada producto al pedido usando la API
         for (const p of nuevoPedido.productos) {
           await agregarProducto({
-            idPedido,
             idProducto: p.id,
             cantidad: p.cantidad,
-            monto: p.subtotal
+            monto: p.subtotal,
+            idPedido
           });
         }
         if (onPedidoAgregado) onPedidoAgregado();
