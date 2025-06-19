@@ -76,3 +76,4 @@ export function eliminarPedido(id) {
             throw error;
         });
 } 
+

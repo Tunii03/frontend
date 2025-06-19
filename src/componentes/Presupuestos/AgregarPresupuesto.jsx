@@ -69,11 +69,11 @@ export default function AgregarPresupuesto() {
                     required
                 >
                     <option value="">Seleccione un pedido</option>
-                    {pedidos.map(p => (
-                        <option key={p.id} value={p.id}>
-                            #{p.id} - {p.cliente} - ${p.montoTotal}
-                        </option>
-                    ))}
+                    {Array.isArray(pedidos) && pedidos.map(p => (
+    <option key={p.id} value={p.id}>
+        #{p.id} - Cliente {p.clienteId} - ${p.monto}
+    </option>
+))}
                 </select>
             </div>
             <div className="form-group">

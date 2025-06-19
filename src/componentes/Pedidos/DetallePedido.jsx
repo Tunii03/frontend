@@ -9,7 +9,7 @@ export default function DetallePedido() {
     const { id } = useParams();
     const navigate = useNavigate();
     // Estado para el pedido actual
-    const [pedido, setPedido] = useState(null);
+    const [pedido, setPedido] = useState([]);
     // Estado para errores
     const [error, setError] = useState(null);
     // Estado para loading
@@ -26,6 +26,7 @@ export default function DetallePedido() {
         setError(null);
         try {
             const pedidoEncontrado = await obtenerPedido(id);
+            console.log({pedidoEncontrado})
             if (pedidoEncontrado) {
                 setPedido(pedidoEncontrado);
             } else {
@@ -35,9 +36,9 @@ export default function DetallePedido() {
             setError('Error al cargar el pedido');
         } finally {
             setLoading(false);
-        }
+        }   
     };
-
+  
     if (loading) {
         // Muestra un mensaje de carga
         return (
@@ -84,38 +85,17 @@ export default function DetallePedido() {
                 <Card.Body>
                     <div className="info-cliente">
                         <h3>Información del Cliente</h3>
-                        <p><strong>Cliente:</strong> {pedido.cliente}</p>
-                        <p><strong>Fecha:</strong> {pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : ''}</p>
+                        <p><strong>Cliente: </strong>{pedido.cliente ? `${pedido.cliente.nombre} (${pedido.cliente.cuit})` : pedido.clienteId}</p>
+                        <p><strong>Fecha: </strong>{pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : new Date(pedido.createdAt).toLocaleDateString()}</p>
                     </div>
-
-                    <div className="productos-pedido">
-                        <h3>Productos</h3>
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unitario</th>
-                                    <th>Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pedido.productos && pedido.productos.map((producto, index) => (
-                                    <tr key={index}>
-                                        <td>{producto.nombre}</td>
-                                        <td>{producto.cantidad}</td>
-                                        <td>${producto.precio}</td>
-                                        <td>${producto.subtotal}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                            <tfoot>
+                    <div>
+                        <tfoot>
                                 <tr>
                                     <td colSpan="3" className="text-end"><strong>Total:</strong></td>
-                                    <td><strong>${pedido.montoTotal}</strong></td>
+                                    <td><strong>${pedido.monto}</strong></td>
                                 </tr>
                             </tfoot>
-                        </Table>
+                        
                     </div>
                 </Card.Body>
             </Card>
