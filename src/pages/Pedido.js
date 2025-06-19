@@ -1,19 +1,19 @@
 import axios from 'axios';
 
-export function crearPedido({monto, idcliente}) {
+export function crearPedido({monto, clienteId}) {
     const datos = {
         monto: monto,
-        clienteId: idcliente
+        clienteId: clienteId
     };
     return axios.post('http://localhost:8080/api/pedido', datos)
     .then(function(response){
-        console.log(response)
-        return response
+        console.log('Respuesta del servidor:', response);
+        return response;
     })
     .catch(function(error){
-        console.log(error)
-        throw error
-    })
+        console.log('Error al crear pedido:', error);
+        throw error;
+    });
 }
 
 export function agregarProducto({idPedido, idProducto, cantidad, monto}) {
@@ -32,7 +32,10 @@ export function agregarProducto({idPedido, idProducto, cantidad, monto}) {
 
 export function obtenerPedidos() {
     return axios.get('http://localhost:8080/api/pedido')
-        .then(response => response.data)
+        .then(response => {
+            console.log('Pedidos recibidos:', response.data);
+            return response.data;
+        })
         .catch(error => {
             console.error('Error al obtener pedidos:', error);
             throw error;

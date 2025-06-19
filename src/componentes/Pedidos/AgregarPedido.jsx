@@ -70,12 +70,12 @@ export default function AgregarPedido({
       if (nuevoPedido.clienteId && nuevoPedido.productos.length > 0) {
         // 1. Crear el pedido y obtener el id
          console.log('📦 Objeto de pedido a enviar al backend:', {
-            idcliente: nuevoPedido.clienteId,
+            clienteId: nuevoPedido.clienteId,
             monto: nuevoPedido.montoTotal // <-- Aquí ves el valor de monto/montoTotal
         });
         const pedidoCreado = await crearPedido({
           monto: nuevoPedido.montoTotal,
-          idcliente: nuevoPedido.clienteId
+          clienteId: nuevoPedido.clienteId
         });
         
         const idPedido = pedidoCreado.data.id;
@@ -90,7 +90,7 @@ export default function AgregarPedido({
           });
         }
         if (onPedidoAgregado) onPedidoAgregado();
-        setNuevoPedido({ clienteId: '', productos: [], montoTotal: 0 });
+        setNuevoPedido({ clienteId: clienteId, productos: [], montoTotal: 0 });
         onHide();
       } else {
         setError('Debe seleccionar un cliente y al menos un producto');
