@@ -39,6 +39,7 @@ import axios from 'axios'
     }
     export function actualizarProducto({id,nombre,stock,descripcion,precio}){
         const datos ={
+            id: id,
             nombre: nombre,
             stock: stock,
             descripcion:descripcion,
