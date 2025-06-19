@@ -127,7 +127,7 @@ export default function Pedidos() {
                             pedidos.map(pedido => (
                                 <tr key={pedido.id}>
                                     <td>{pedido.id}</td>
-                                    <td>{pedido.cliente ? `${pedido.cliente.nombre} (${pedido.cliente.cuit})` : pedido.clienteId}</td>
+                                    <td>{pedido.cliente ? `${pedido.cliente.nombre}` : pedido.clienteId}</td>
                                     <td>{pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : new Date(pedido.createdAt).toLocaleDateString()}</td>
                                     <td>${pedido.monto}</td>
                                     <td>
