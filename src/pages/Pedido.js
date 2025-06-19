@@ -53,12 +53,17 @@ export function obtenerPedido(id) {
 
 export function actualizarPedido({id, monto}) {
     const datos = {
+        id: id,
         monto: monto
     };
     return axios.put(`http://localhost:8080/api/pedido/${id}`, datos)
-        .then(response => response.data)
+        .then(response => {
+            console.log('Respuesta de actualización:', response);
+            return response.data;
+        })
         .catch(error => {
             console.error('Error al actualizar pedido:', error);
+            console.error('Detalles del error:', error.response?.data);
             throw error;
         });
 }

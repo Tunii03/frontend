@@ -18,7 +18,7 @@ export default function Inicio() {
       </div>
 
       <div className='imagen'>
-        <Image src="/imagen.jpg" fluid />
+        <Image src="/imagen.png" fluid />
       </div>
     </div>
   );
