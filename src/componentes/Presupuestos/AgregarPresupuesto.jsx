@@ -21,8 +21,9 @@ export default function AgregarPresupuesto() {
     useEffect(() => {
         const cargarPedidos = async () => {
             try {
-                const response = await obtenerPedidos();
-                setPedidos(response.data);
+                const pedidosData = await obtenerPedidos();  
+                console.log("Pedidos desde front:", pedidosData);
+                setPedidos(pedidosData);
             } catch (error) {
                 setError('Error al cargar los pedidos');
                 console.error('Error:', error);

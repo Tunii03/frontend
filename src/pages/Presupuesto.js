@@ -39,19 +39,5 @@ import axios from 'axios'
             throw error
         })
     }
-    export function actualizarPresupuesto({id,monto}){
-        const datos ={
-            monto:monto
-        }
-        return axios.put(`http://localhost:8080/api/presupuesto/${id}`,datos)
-        .then(function(response){
-            console.log(response)
-            return response
-        })
-        .catch(function(error){
-            console.log(error)
-            throw error
-        })
-    }
 
    
