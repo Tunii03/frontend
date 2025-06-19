@@ -44,8 +44,8 @@ export default function AgregarPresupuesto() {
         }
         try {
             await crearPresupuesto({
-                idpedido: idPedido,
-                estado: estado
+                estado: estado,
+                idpedido: idPedido
             });
             navigate('/presupuestos');
         } catch (error) {
