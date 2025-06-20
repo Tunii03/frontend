@@ -1,12 +1,11 @@
-import {useState,useEffect} from 'react'
 import axios from 'axios'
 
-    export function crearPresupuesto(idpedido,estado){
+    export function crearPresupuesto(pedidoId){
         const datos = {
-            estado:estado,
-            pedidoId:idpedido
+            estado:false,
+            pedidoId:pedidoId
         }
-        return axios.post('http://localhost:8080/api/presupuesto',datos)
+        return axios.post('http://localhost:8080/api/presupuesto', datos)
         .then(function(response){
             console.log(response)
             return response
@@ -21,7 +20,7 @@ import axios from 'axios'
         return axios.get(`http://localhost:8080/api/presupuesto`)
         .then((data)=>{
             setPresupuesto(data)
-            return data
+            return presupuestos
         })
         .catch((error)=>{
             console.log(error)
@@ -32,7 +31,7 @@ import axios from 'axios'
         return axios.get(`http://localhost:8080/api/presupuesto/${id}`)
         .then((data)=>{
             setPresupuesto(data)
-            return data
+            return presupuesto
         })
         .catch((error)=>{
             console.log(error)

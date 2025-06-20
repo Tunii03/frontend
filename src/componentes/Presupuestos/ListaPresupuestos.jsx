@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaEye } from 'react-icons/fa';
+import { Button, Table, Alert, Spinner } from 'react-bootstrap';
 import { buscarPresupuestos } from '../../pages/Presupuesto';
 import './ListaPresupuestos.css';
 import { useTitulo } from '../../context/TituloContext';
+import AgregarPresupuesto from './AgregarPresupuesto';
 
 export default function ListaPresupuestos() {
     // Estado para la lista de presupuestos
     const [presupuestos, setPresupuestos] = useState([]);
+    const [pedidos, setPedidos] = useState([]);
     // Estado para loading
+    const [mostrarModal, setMostrarModal] = useState(false);
     const [loading, setLoading] = useState(true);
     // Estado para errores
     const [error, setError] = useState(null);
@@ -18,9 +22,23 @@ export default function ListaPresupuestos() {
     // Carga los presupuestos al montar el componente
     useEffect(() => {
         setTitulo('Presupuestos');
+        cargarPedidos();
         cargarPresupuestos();
     }, []);
 
+
+    const cargarPedidos = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await obtenerPedidos();
+            setPedidos(data);
+        } catch (error) {
+            setError('Error al cargar los pedidos');
+        } finally {
+            setLoading(false);
+        }
+    };
     // Obtiene los presupuestos desde la API
     const cargarPresupuestos = async () => {
         setLoading(true);
@@ -40,18 +58,14 @@ export default function ListaPresupuestos() {
         navigate(`/presupuestos/${id}`);
     };
 
-    // Navega al formulario de agregar presupuesto
-    const agregarPresupuesto = () => {
-        navigate('/presupuestos/agregar');
-    };
 
     return (
         <div className="presupuestos-container">
             <div className="header-presupuestos">
                 <h1>{titulo}</h1>
-                <button className="btn-agregar" onClick={agregarPresupuesto}>
+                <Button variant="primary" onClick={() => setMostrarModal(true)}>
                     <FaPlus /> Nuevo Presupuesto
-                </button>
+                </Button>
             </div>
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="tabla-presupuestos-wrapper">
@@ -86,6 +100,14 @@ export default function ListaPresupuestos() {
                     </tbody>
                 </table>
             </div>
+            <AgregarPresupuesto
+                show={mostrarModal}
+                onHide={() => setMostrarModal(false)}
+                onPresupuestoAgregado={(nuevo) => {
+                    setPresupuestos(prev => [...prev,nuevo])
+                }}
+                pedidosGlobal={pedidos}
+            ></AgregarPresupuesto>
         </div>
     );
 } 

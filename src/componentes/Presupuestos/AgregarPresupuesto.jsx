@@ -1,93 +1,114 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, Modal, Form, Spinner, Alert } from 'react-bootstrap';
+import './AgregarPresupuesto.css'; // O './AgregarPresupuesto.css' si creas uno nuevo
 import { crearPresupuesto } from '../../pages/Presupuesto';
-import { obtenerPedidos } from '../../pages/Pedido';
-import './AgregarPresupuesto.css';
 
-export default function AgregarPresupuesto() {
-    // Estado para la lista de pedidos
-    const [pedidos, setPedidos] = useState([]);
-    // Estado para el pedido seleccionado
-    const [idPedido, setIdPedido] = useState('');
-    // Estado para el estado del presupuesto (pagado/pendiente)
-    const [estado, setEstado] = useState(false);
-    // Estado para errores
+
+export default function AgregarPresupuesto({
+    show, onHide, onPresupuestoAgregado, pedidosGlobal
+}) {
+    // Estado para el nuevo presupuesto
+    const [nuevoPresupuesto, setNuevoPresupuesto] = useState({
+        estado:false,
+        idPedido: '' 
+    });
+
+    // Estado para la lista de productos y pedidos
+
+    const [pedidos, setPedidos] = useState([]); // Ahora necesitamos la lista de pedidos
+
+    // Estado para el producto seleccionado y cantidad
+   
+    // Estado para errores y loading
     const [error, setError] = useState(null);
-    // Estado para loading
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
-    // Carga los pedidos al montar el componente
+    // Actualiza productos y pedidos cuando cambian los props
     useEffect(() => {
-        const cargarPedidos = async () => {
-            try {
-                const pedidosData = await obtenerPedidos();  
-                console.log("Pedidos desde front:", pedidosData);
-                setPedidos(pedidosData);
-            } catch (error) {
-                setError('Error al cargar los pedidos');
-                console.error('Error:', error);
-            }
-        };
-        cargarPedidos();
-    }, []);
+        setPedidos(pedidosGlobal || []); // Asigna los pedidos globales
+    }, [pedidosGlobal]); // Depende de productosGlobal y pedidosGlobal
 
-    // Maneja el envío del formulario para agregar un presupuesto
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+
+    
+    // Guarda el presupuesto completo
+    const guardarPresupuesto = async () => {
         setLoading(true);
         setError(null);
-        // Validación simple de selección de pedido
-        if (!idPedido) {
-            setError('Debe seleccionar un pedido');
-            setLoading(false);
-            return;
-        }
         try {
-            await crearPresupuesto({
-                estado: estado,
-                idpedido: idPedido
-            });
-            navigate('/presupuestos');
+            if (nuevoPresupuesto.pedidoId) {
+                // 1. Crear el presupuesto y obtener el id
+                console.log('📦 Objeto de presupuesto a enviar al backend:', {
+                    pedidoId: nuevoPresupuesto.pedidoId, // Envía el ID del pedido asociado
+                });
+                const presupuestoCreado = await crearPresupuesto({
+                    pedidoId: nuevoPresupuesto.pedidoId
+                });
+
+                const idPresupuesto = presupuestoCreado.data.id; // Asumo que la API devuelve { data: { id: ... } }
+                console.log('Presupuesto creado con ID:', idPresupuesto);
+
+    
+                // 3. Crear objeto con la estructura correcta para la lista de presupuestos
+                const presupuestoParaLista = {
+                    id: idPresupuesto,
+                    estado: false,
+                    pedidoId: nuevoPresupuesto.pedidoId
+                };
+
+                if (onPresupuestoAgregado) onPresupuestoAgregado(presupuestoParaLista);
+                
+                // Resetear estados y cerrar modal
+                setNuevoPresupuesto({ pedidoId: '', estado:false });
+                onHide();
+            } else {
+                setError('Debe seleccionar un pedido');
+            }
         } catch (error) {
-            setError('Error al guardar el presupuesto');
-            console.error('Error:', error);
+            setError('Error al guardar el presupuesto.');
+            console.error('Error completo al guardar presupuesto:', error.response ? error.response.data : error.message);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="formulario-presupuesto">
-            <h2>Nuevo Presupuesto</h2>
-            {/* Muestra errores de validación o guardado */}
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div className="form-group">
-                <label>Pedido:</label>
-                <select
-                    value={idPedido}
-                    onChange={e => setIdPedido(e.target.value)}
-                    required
+        <Modal show={show} onHide={onHide} size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>Nuevo Presupuesto</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    {/* SELECT PARA SELECCIONAR PEDIDO EXISTENTE */}
+                    <Form.Group className="mb-3">
+                        <Form.Label>Pedido Asociado</Form.Label>
+                        <Form.Select
+                            value={nuevoPresupuesto.pedidoId}
+                            onChange={e => setNuevoPresupuesto(prev => ({ ...prev, pedidoId: e.target.value }))}
+                            required
+                        >
+                            <option value="">Seleccione un pedido</option>
+                            {pedidos.map(p => (
+                                <option key={p.id} value={p.id}>
+                                   
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
+
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    Cancelar
+                </Button>
+                <Button
+                    variant="primary"
+                    onClick={guardarPresupuesto}
+                    disabled={loading}
                 >
-                    <option value="">Seleccione un pedido</option>
-                    {Array.isArray(pedidos) && pedidos.map(p => (
-    <option key={p.id} value={p.id}>
-        #{p.id} - Cliente {p.clienteId} - ${p.monto}
-    </option>
-))}
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Estado:</label>
-                <select value={estado} onChange={e => setEstado(e.target.value === 'true')} required>
-                    <option value={false}>Pendiente</option>
-                    <option value={true}>Pagado</option>
-                </select>
-            </div>
-            <button type="submit" className="btn-submit" disabled={loading}>
-                {loading ? 'Guardando...' : 'Crear Presupuesto'}
-            </button>
-            <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/presupuestos')}>Cancelar</button>
-        </form>
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Guardar Presupuesto'}
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
-} 
+}
