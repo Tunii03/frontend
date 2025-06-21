@@ -28,6 +28,7 @@ export default function ListaClientes() {
         try {
             const response = await buscarClientes();
             setClientes(response.data);
+            console.log('Clientes cargados correctamente');
         } catch (error) {
             setError('Error al cargar los clientes');
         } finally {
@@ -41,6 +42,7 @@ export default function ListaClientes() {
         try {
             await borrarCliente({ id });
             setClientes(clientes.filter(c => c.id !== id));
+            console.log('Cliente eliminado correctamente');
         } catch (error) {
             setError('Error al eliminar el cliente');
         }

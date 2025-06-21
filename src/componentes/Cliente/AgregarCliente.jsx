@@ -23,6 +23,7 @@ export default function AgregarCliente() {
         }
         try {
             await crearCliente(nombre, razonSocial, email, cuit);
+            console.log('Cliente creado correctamente');
             navigate('/clientes');
         } catch (error) {
             setError('Error al guardar el cliente');

@@ -43,6 +43,7 @@ export default function EditarPedido() {
                 monto: montoTotal
             });
             navigate('/pedidos');
+            console.log('Pedido actualizado correctamente');
         } catch (error) {
             setError('Error al guardar los cambios');
         }

@@ -28,16 +28,12 @@ export default function AgregarPedido({
     setClientes(clientesGlobal || []);
   }, [productosGlobal, clientesGlobal]);
 
-  // Agrega un producto al pedido con validación de stock
+  // Agrega un producto al pedido
   const agregarProductoAlPedido = () => {
     const producto = productos.find(p => p.id === Number(productoSeleccionado));
     if (producto) {
-      const cantidadNum = Number(cantidad);
-      if (cantidadNum > producto.stock) {
-        setError(`No hay suficiente stock para "${producto.nombre}". Stock disponible: ${producto.stock}`);
-        return;
-      }
       setError(null);
+      const cantidadNum = Number(cantidad);
       const productoConCantidad = {
         ...producto,
         cantidad: cantidadNum,
@@ -68,7 +64,7 @@ export default function AgregarPedido({
     setError(null);
     try {
       if (nuevoPedido.clienteId && nuevoPedido.productos.length > 0) {
-        // 1. Crear el pedido y obtener el id
+     
          console.log('📦 Objeto de pedido a enviar al backend:', {
             clienteId: nuevoPedido.clienteId,
             monto: nuevoPedido.montoTotal
@@ -81,7 +77,7 @@ export default function AgregarPedido({
         const idPedido = pedidoCreado.data.id;
         console.log('Pedido creado con ID:', idPedido);
         
-        // 2. Agregar cada producto al pedido usando la API
+       
         for (const p of nuevoPedido.productos) {
           await agregarProducto({
             idProducto: p.id,
@@ -91,13 +87,15 @@ export default function AgregarPedido({
           });
         }
 
-        // 3. Crear objeto con la estructura correcta para la lista
+        const clienteSeleccionado = clientes.find(c => c.id == nuevoPedido.clienteId);
+
         const pedidoParaLista = {
           id: idPedido,
           clienteId: nuevoPedido.clienteId,
           monto: nuevoPedido.montoTotal,
           fecha: new Date().toISOString(),
-          productos: nuevoPedido.productos
+          productos: nuevoPedido.productos,
+          cliente: clienteSeleccionado || { nombre: 'Cliente no encontrado' } // Adjuntar el objeto cliente
         };
 
         if (onPedidoAgregado) onPedidoAgregado(pedidoParaLista);

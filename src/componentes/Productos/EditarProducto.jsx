@@ -54,7 +54,7 @@ export default function EditarProducto() {
         console.log('Intentando actualizar producto:', { id, nombre, stock, descripcion, precio });
         
         try {
-            await actualizarProducto({
+            const response = await actualizarProducto({
                 id,
                 nombre,
                 stock: Number(stock),

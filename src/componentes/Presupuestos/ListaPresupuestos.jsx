@@ -26,10 +26,18 @@ export default function ListaPresupuestos() {
         setLoading(true);
         setError(null);
         try {
+            console.log('Intentando cargar presupuestos...');
             const response = await buscarPresupuestos();
-            setPresupuestos(response.data);
+            console.log('Respuesta de presupuestos:', response);
+            if (response && response.data) {
+                console.log('Datos de presupuestos recibidos:', response.data);
+                setPresupuestos(response.data);
+            } else {
+                setError('Respuesta inválida del servidor');
+            }
         } catch (error) {
-            setError('Error al cargar los presupuestos');
+            console.error('Error detallado al cargar presupuestos:', error);
+            setError(`Error al cargar los presupuestos: ${error.message || 'Error desconocido'}`);
         } finally {
             setLoading(false);
         }
@@ -74,8 +82,8 @@ export default function ListaPresupuestos() {
                             presupuestos.map(p => (
                                 <tr key={p.id}>
                                     <td>{p.id}</td>
-                                    <td>{p.pedidoId || p.idPedido}</td>
-                                    <td>{p.createdDate ? new Date(p.createdDate).toLocaleDateString() : ''}</td>
+                                    <td>{p.pedidoId}</td>
+                                    <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</td>
                                     <td>{p.estado ? 'Pagado' : 'Pendiente'}</td>
                                     <td>
                                         <button className="btn-ver" title="Ver Detalle" onClick={() => verDetallePresupuesto(p.id)}><FaEye /></button>

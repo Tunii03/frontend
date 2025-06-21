@@ -17,22 +17,21 @@ import axios from 'axios'
         })
     }
     export function buscarPresupuestos(){
-        const [presupuestos, setPresupuestos] = useState([])
         return axios.get(`http://localhost:8080/api/presupuesto`)
-        .then((data)=>{
-            setPresupuesto(data)
-            return data
+        .then((response)=>{
+            console.log(response)
+            return response
         })
         .catch((error)=>{
             console.log(error)
+            throw error
         })
     }
-    export function mostrarPresupuesto({id}){
-        const [presupuesto,setPresupuesto] = useState([])
+    export function mostrarPresupuesto(id){
         return axios.get(`http://localhost:8080/api/presupuesto/${id}`)
-        .then((data)=>{
-            setPresupuesto(data)
-            return data
+        .then((response)=>{
+            console.log(response)
+            return response
         })
         .catch((error)=>{
             console.log(error)

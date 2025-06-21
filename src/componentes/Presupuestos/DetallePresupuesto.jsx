@@ -26,7 +26,9 @@ export default function DetallePresupuesto() {
         setLoading(true);
         setError(null);
         try {
-            const presupuestoData = await mostrarPresupuesto({ id });
+            const presupuestoResponse = await mostrarPresupuesto(id);
+            const presupuestoData = presupuestoResponse.data;
+            console.log('Datos del presupuesto recibidos:', presupuestoData);
             setPresupuesto(presupuestoData);
             if (presupuestoData.pedidoId) {
                 const pedidoData = await obtenerPedido(presupuestoData.pedidoId);
@@ -35,6 +37,7 @@ export default function DetallePresupuesto() {
                 setPedido(null);
             }
         } catch (error) {
+            console.error('Error al cargar presupuesto:', error);
             setError('Error al cargar el presupuesto');
         } finally {
             setLoading(false);
@@ -58,22 +61,11 @@ export default function DetallePresupuesto() {
                 <button className="btn-volver" onClick={() => navigate('/presupuestos')}>Volver a Presupuestos</button>
             </div>
             <div className="info-presupuesto">
-                <p><strong>Pedido Asociado:</strong> #{presupuesto.pedidoId || presupuesto.idPedido}</p>
-                <p><strong>Fecha:</strong> {presupuesto.createdDate ? new Date(presupuesto.createdDate).toLocaleDateString() : ''}</p>
+                <p><strong>Pedido Asociado:</strong> #{presupuesto.pedidoId}</p>
+                <p><strong>Fecha:</strong> {presupuesto.createdAt ? new Date(presupuesto.createdAt).toLocaleDateString() : ''}</p>
                 <p><strong>Estado:</strong> {presupuesto.estado ? 'Pagado' : 'Pendiente'}</p>
             </div>
-            {pedido && (
-                <div className="pedido-relacionado">
-                    <h3>Detalle del Pedido</h3>
-                    <p><strong>Cliente:</strong> {pedido.cliente}</p>
-                    <p><strong>Monto Total:</strong> ${pedido.montoTotal}</p>
-                    <ul>
-                        {pedido.productos && pedido.productos.map((prod, idx) => (
-                            <li key={idx}>{prod.nombre} x{prod.cantidad} - ${prod.subtotal}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            
         </div>
     );
 } 

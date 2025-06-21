@@ -89,13 +89,7 @@ export default function DetallePedido() {
                         <p><strong>Fecha: </strong>{pedido.fecha ? new Date(pedido.fecha).toLocaleDateString() : new Date(pedido.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div>
-                        <tfoot>
-                                <tr>
-                                    <td colSpan="3" className="text-end"><strong>Total:</strong></td>
-                                    <td><strong>${pedido.monto}</strong></td>
-                                </tr>
-                            </tfoot>
-                        
+                        <p><strong>Total:</strong> ${pedido.monto}</p>
                     </div>
                 </Card.Body>
             </Card>

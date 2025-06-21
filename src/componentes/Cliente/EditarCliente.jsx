@@ -54,6 +54,7 @@ export default function EditarCliente() {
                 cuit: Number(cuit)
             });
             navigate('/clientes');
+            console.log('Cliente actualizado correctamente');
         } catch (error) {
             setError('Error al guardar los cambios');
         }

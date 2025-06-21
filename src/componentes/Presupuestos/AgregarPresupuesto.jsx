@@ -1,36 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { crearPresupuesto } from '../../pages/Presupuesto';
+import { crearPresupuesto, buscarPresupuestos } from '../../pages/Presupuesto';
 import { obtenerPedidos } from '../../pages/Pedido';
 import './AgregarPresupuesto.css';
 
 export default function AgregarPresupuesto() {
     // Estado para la lista de pedidos
     const [pedidos, setPedidos] = useState([]);
+    // Estado para la lista de presupuestos existentes
+    const [presupuestos, setPresupuestos] = useState([]);
     // Estado para el pedido seleccionado
     const [idPedido, setIdPedido] = useState('');
-    // Estado para el estado del presupuesto (pagado/pendiente)
-    const [estado, setEstado] = useState(false);
     // Estado para errores
     const [error, setError] = useState(null);
     // Estado para loading
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Carga los pedidos al montar el componente
+    // Carga los pedidos y presupuestos al montar el componente
     useEffect(() => {
-        const cargarPedidos = async () => {
+        const cargarDatos = async () => {
             try {
+                // Cargar pedidos
                 const pedidosData = await obtenerPedidos();  
                 console.log("Pedidos desde front:", pedidosData);
                 setPedidos(pedidosData);
+
+                // Cargar presupuestos existentes
+                const presupuestosResponse = await buscarPresupuestos();
+                const presupuestosData = presupuestosResponse.data;
+                console.log("Presupuestos existentes:", presupuestosData);
+                setPresupuestos(presupuestosData);
             } catch (error) {
-                setError('Error al cargar los pedidos');
+                setError('Error al cargar los datos');
                 console.error('Error:', error);
             }
         };
-        cargarPedidos();
+        cargarDatos();
     }, []);
+
+    // Filtra los pedidos que ya tienen presupuesto
+    const pedidosDisponibles = pedidos.filter(pedido => {
+        return !presupuestos.some(presupuesto => presupuesto.pedidoId === pedido.id);
+    });
 
     // Maneja el envío del formulario para agregar un presupuesto
     const handleSubmit = async (e) => {
@@ -44,10 +56,8 @@ export default function AgregarPresupuesto() {
             return;
         }
         try {
-            await crearPresupuesto({
-                estado: estado,
-                idpedido: idPedido
-            });
+            // El estado siempre será false (pendiente) automáticamente
+            await crearPresupuesto(idPedido, false);
             navigate('/presupuestos');
         } catch (error) {
             setError('Error al guardar el presupuesto');
@@ -70,21 +80,38 @@ export default function AgregarPresupuesto() {
                     required
                 >
                     <option value="">Seleccione un pedido</option>
-                    {Array.isArray(pedidos) && pedidos.map(p => (
-    <option key={p.id} value={p.id}>
-        #{p.id} - Cliente {p.clienteId} - ${p.monto}
-    </option>
-))}
+                    {Array.isArray(pedidosDisponibles) && pedidosDisponibles.length > 0 ? (
+                        pedidosDisponibles.map(p => (
+                            <option 
+                            key={p.id} 
+                            value={p.id}>
+                                #{p.id} - 
+                                Cliente 
+                                {p.clienteId} - 
+                                ${p.monto}
+                            </option>
+                        ))
+                    ) : (
+                        <option value="" disabled>No hay pedidos disponibles para presupuesto</option>
+                    )}
                 </select>
+                {pedidosDisponibles.length === 0 && pedidos.length > 0 && (
+                    <small className="form-text" style={{color: '#dc3545'}}>
+                        Todos los pedidos ya tienen presupuesto asociado
+                    </small>
+                )}
             </div>
             <div className="form-group">
                 <label>Estado:</label>
-                <select value={estado} onChange={e => setEstado(e.target.value === 'true')} required>
-                    <option value={false}>Pendiente</option>
-                    <option value={true}>Pagado</option>
-                </select>
+                <input 
+                    type="text" 
+                    value="Pendiente" 
+                    disabled 
+                    className="estado-disabled"
+                />
+                <small className="form-text">El estado se establece automáticamente como "Pendiente"</small>
             </div>
-            <button type="submit" className="btn-submit" disabled={loading}>
+            <button type="submit" className="btn-submit" disabled={loading || pedidosDisponibles.length === 0}>
                 {loading ? 'Guardando...' : 'Crear Presupuesto'}
             </button>
             <button type="button" className="btn-submit" style={{background:'#6c757d',marginTop:'10px'}} onClick={()=>navigate('/presupuestos')}>Cancelar</button>

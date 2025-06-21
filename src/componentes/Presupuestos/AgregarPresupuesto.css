@@ -41,6 +41,26 @@
     box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
 }
 
+.estado-disabled {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    border-color: #dee2e6 !important;
+}
+
+.estado-disabled:focus {
+    border-color: #dee2e6 !important;
+    box-shadow: none !important;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
 .btn-submit {
     width: 100%;
     padding: 0.75rem;
