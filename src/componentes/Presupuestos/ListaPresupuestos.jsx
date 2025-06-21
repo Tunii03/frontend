@@ -1,99 +1,117 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, Table, Alert, Spinner } from 'react-bootstrap';
 import { FaPlus, FaEye } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { buscarPresupuestos } from '../../pages/Presupuesto';
+import { obtenerPedidos } from '../../pages/Pedido'; // Para cargar los pedidos
+import AgregarPresupuesto from './AgregarPresupuesto'; // Importa el nuevo modal
 import './ListaPresupuestos.css';
 import { useTitulo } from '../../context/TituloContext';
 
 export default function ListaPresupuestos() {
-    // Estado para la lista de presupuestos
-    const [presupuestos, setPresupuestos] = useState([]);
-    // Estado para loading
-    const [loading, setLoading] = useState(true);
-    // Estado para errores
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { titulo, setTitulo } = useTitulo();
+    const { setTitulo } = useTitulo();
 
-    // Carga los presupuestos al montar el componente
+    const [presupuestos, setPresupuestos] = useState([]);
+    const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [mostrarModal, setMostrarModal] = useState(false); // Estado para el modal
+
     useEffect(() => {
         setTitulo('Presupuestos');
-        cargarPresupuestos();
-    }, []);
+        cargarDatos();
+    }, [setTitulo]);
 
-    // Obtiene los presupuestos desde la API
-    const cargarPresupuestos = async () => {
+    // Carga tanto presupuestos como pedidos
+    const cargarDatos = async () => {
         setLoading(true);
         setError(null);
         try {
-            console.log('Intentando cargar presupuestos...');
-            const response = await buscarPresupuestos();
-            console.log('Respuesta de presupuestos:', response);
-            if (response && response.data) {
-                console.log('Datos de presupuestos recibidos:', response.data);
-                setPresupuestos(response.data);
-            } else {
-                setError('Respuesta inválida del servidor');
-            }
-        } catch (error) {
-            console.error('Error detallado al cargar presupuestos:', error);
-            setError(`Error al cargar los presupuestos: ${error.message || 'Error desconocido'}`);
+            const [presupuestosRes, pedidosRes] = await Promise.all([
+                buscarPresupuestos(),
+                obtenerPedidos()
+            ]);
+            setPresupuestos(presupuestosRes.data);
+            setPedidos(pedidosRes); // obtenerPedidos devuelve el array directamente
+        } catch (err) {
+            setError('Error al cargar los datos. Intente recargar la página.');
+            console.error('Error al cargar datos de presupuestos/pedidos:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Navega al detalle del presupuesto
     const verDetallePresupuesto = (id) => {
         navigate(`/presupuestos/${id}`);
     };
 
-    // Navega al formulario de agregar presupuesto
-    const agregarPresupuesto = () => {
-        navigate('/presupuestos/agregar');
+    // Función para manejar la adición de un nuevo presupuesto desde el modal
+    const handlePresupuestoAgregado = () => {
+        // En lugar de añadir un objeto incompleto, simplemente
+        // volvemos a cargar todos los datos desde el servidor.
+        // Esto garantiza que la información siempre es correcta.
+        cargarDatos();
     };
 
     return (
         <div className="presupuestos-container">
             <div className="header-presupuestos">
-                <h1>{titulo}</h1>
-                <button className="btn-agregar" onClick={agregarPresupuesto}>
+                <h1>Presupuestos</h1>
+                <Button onClick={() => setMostrarModal(true)}>
                     <FaPlus /> Nuevo Presupuesto
-                </button>
+                </Button>
             </div>
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div className="tabla-presupuestos-wrapper">
-                <table className="tabla-presupuestos">
+            
+            {error && <Alert variant="danger">{error}</Alert>}
+            
+            {loading ? (
+                <div className="text-center"><Spinner animation="border" /></div>
+            ) : (
+                <Table striped bordered hover responsive>
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Pedido</th>
+                            <th>Pedido Asociado</th>
                             <th>Fecha</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <tr><td colSpan="5">Cargando...</td></tr>
-                        ) : presupuestos.length === 0 ? (
-                            <tr><td colSpan="5">No hay presupuestos registrados.</td></tr>
+                        {presupuestos.length === 0 ? (
+                            <tr><td colSpan="5" className="text-center">No hay presupuestos registrados.</td></tr>
                         ) : (
-                            presupuestos.map(p => (
-                                <tr key={p.id}>
-                                    <td>{p.id}</td>
-                                    <td>{p.pedidoId}</td>
-                                    <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</td>
-                                    <td>{p.estado ? 'Pagado' : 'Pendiente'}</td>
-                                    <td>
-                                        <button className="btn-ver" title="Ver Detalle" onClick={() => verDetallePresupuesto(p.id)}><FaEye /></button>
-                                    </td>
-                                </tr>
-                            ))
+                            presupuestos.map(p => {
+                                // Buscamos el cliente en la lista de pedidos
+                                const pedidoAsociado = pedidos.find(ped => ped.id === p.pedidoId);
+                                return (
+                                    <tr key={p.id}>
+                                        <td>{p.id}</td>
+                                        <td>Pedido #{p.pedidoId} (Cliente: {pedidoAsociado?.cliente?.nombre || 'N/A'})</td>
+                                        <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'N/A'}</td>
+                                        <td>{p.estado ? 'Pagado' : 'Pendiente'}</td>
+                                        <td>
+                                            <Button variant="info" size="sm" title="Ver Detalle" onClick={() => verDetallePresupuesto(p.id)}>
+                                                <FaEye />
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         )}
                     </tbody>
-                </table>
-            </div>
+                </Table>
+            )}
+
+            {/* Renderiza el Modal */}
+            <AgregarPresupuesto
+                show={mostrarModal}
+                onHide={() => setMostrarModal(false)}
+                pedidos={pedidos}
+                presupuestos={presupuestos}
+                onPresupuestoAgregado={handlePresupuestoAgregado}
+            />
         </div>
     );
 } 

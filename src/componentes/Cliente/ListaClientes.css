@@ -1,14 +1,14 @@
 .clientes-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 30px;
 }
 
 .header-clientes {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 30px;
 }
 
 .header-clientes h1 {
@@ -36,35 +36,21 @@
     background-color: #0056b3;
 }
 
-.tabla-clientes-wrapper {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 2rem;
-}
-
 .tabla-clientes {
-    width: 100%;
-    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .tabla-clientes th {
     background-color: #f8f9fa;
-    padding: 1rem;
-    text-align: left;
     font-weight: 600;
     color: #333;
-    border-bottom: 2px solid #dee2e6;
 }
 
 .tabla-clientes td {
-    padding: 1rem;
-    border-bottom: 1px solid #dee2e6;
-    color: #666;
-}
-
-.tabla-clientes tr:hover {
-    background-color: #f8f9fa;
+    vertical-align: middle;
 }
 
 .btn-ver, .btn-editar, .btn-eliminar {
@@ -106,18 +92,12 @@
 
 @media (max-width: 768px) {
     .clientes-container {
-        padding: 1rem;
+        padding: 15px;
     }
+
     .header-clientes {
         flex-direction: column;
-        gap: 1rem;
+        gap: 15px;
         text-align: center;
-    }
-    .tabla-clientes-wrapper {
-        padding: 1rem;
-    }
-    .tabla-clientes {
-        display: block;
-        overflow-x: auto;
     }
 } 

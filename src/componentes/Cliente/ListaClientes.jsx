@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './ListaClientes.css';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { Button, Table, Alert, Spinner } from 'react-bootstrap';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { buscarClientes, borrarCliente } from '../../pages/Cliente';
 import { useTitulo } from '../../context/TituloContext';
+import './ListaClientes.css';
 
 export default function ListaClientes() {
-    // Estado para la lista de clientes
-    const [clientes, setClientes] = useState([]);
-    // Estado para mostrar loading
-    const [loading, setLoading] = useState(true);
-    // Estado para errores
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
     const { titulo, setTitulo } = useTitulo();
+    const navigate = useNavigate();
+    
+    const [clientes, setClientes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Cargar clientes al montar el componente
     useEffect(() => {
         setTitulo('Clientes');
         cargarClientes();
-    }, []);
+    }, [setTitulo]);
 
-    // Obtiene los clientes desde la API
     const cargarClientes = async () => {
         setLoading(true);
         setError(null);
@@ -58,26 +55,36 @@ export default function ListaClientes() {
             <div className="header-clientes">
                 <h1>{titulo}</h1>
                 <button className="btn-agregar" onClick={agregarCliente}>
-                    <FaPlus /> 
+                    <FaPlus /> Nuevo Cliente
                 </button>
             </div>
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div className="tabla-clientes-wrapper">
-                <table className="tabla-clientes">
+            
+            {error && (
+                <Alert variant="danger" className="mb-3">
+                    {error}
+                </Alert>
+            )}
+            
+            {loading ? (
+                <div className="text-center">
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Cargando...</span>
+                    </Spinner>
+                </div>
+            ) : (
+                <Table striped bordered hover className="tabla-clientes">
                     <thead>
                         <tr>
                             <th>Nombre</th>
                             <th>Razón Social</th>
-                            <th>Correo</th>
+                            <th>Email</th>
                             <th>CUIT</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <tr><td colSpan="5">Cargando...</td></tr>
-                        ) : clientes.length === 0 ? (
-                            <tr><td colSpan="5">No hay clientes registrados.</td></tr>
+                        {clientes.length === 0 ? (
+                            <tr><td colSpan="6">No hay clientes registrados.</td></tr>
                         ) : (
                             clientes.map(cliente => (
                                 <tr key={cliente.id}>
@@ -93,8 +100,8 @@ export default function ListaClientes() {
                             ))
                         )}
                     </tbody>
-                </table>
-            </div>
+                </Table>
+            )}
         </div>
     );
 } 
