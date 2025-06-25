@@ -41,7 +41,7 @@ export default function DetalleProducto() {
         <div className="detalle-producto">
             <div className="detalle-contenido">
                 <div className="detalle-imagen">
-                    <img src={producto.imagen} alt={producto.nombre} />
+                    <img src="/imagenGeneral.png" alt={producto.nombre} />
                 </div>
                 <div className="detalle-info">
                     <h1>{producto.nombre}</h1>

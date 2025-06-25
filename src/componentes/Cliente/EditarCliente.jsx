@@ -112,7 +112,7 @@ export default function EditarCliente() {
                 />
             </div>
             <button type="submit" className="btn-submit">Guardar Cambios</button>
-            <button type="button" className="btn-submit">Cancelar</button>
+            
         </form>
     );
 } 

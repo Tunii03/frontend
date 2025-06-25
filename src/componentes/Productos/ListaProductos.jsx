@@ -108,7 +108,7 @@ export default function ListaProductos() {
                 {productosFiltrados.length === 0 ? (
                     <p className="no-productos">No hay productos en el catálogo</p>
                 ) : (
-                    productosFiltrados.map((p) => (
+                    productosFiltrados.map((p,index) => (
                         <div
                             key={p.id}
                             className="producto-item"
@@ -122,7 +122,7 @@ export default function ListaProductos() {
                                 <FaTrash />
                             </button>
                             <div className="producto-imagen-placeholder">
-                                <img src={p.imagen} alt={p.nombre} />
+                                <img src={`/imagen${index + 1}.jpg`} alt={p.nombre} />
                             </div>
                             <div className="producto-info">
                                 <strong>{p.nombre}</strong>
